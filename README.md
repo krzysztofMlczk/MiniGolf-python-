@@ -2,5 +2,5 @@
 
 MiniGolf in python using pygame library.
 
-To setup anaconda environment run:
+To setup anaconda environment on windows run:
 `conda env create -n conda-env -f /path/to/environment.yml`

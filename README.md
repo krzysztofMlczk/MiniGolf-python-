@@ -2,12 +2,8 @@
 
 MiniGolf in python using pygame library.
 
-<<<<<<< 637b9cfec9b050fcdd1e486ce2e4d12b878d67d6
 To setup anaconda environment on windows run:
-`conda env create -n conda-env -f /path/to/environment.yml`
-=======
-To setup anaconda environment run:
-`conda env create -n conda-env -f /path/to/environment.yml`
+conda env create -n conda-env -f /path/to/environment.yml
 
 Ubuntu installation:
 
@@ -26,4 +22,3 @@ Navigate to your conda environment and install pip (if not installed):
 
 Install pygame:
 (minigolf) $ pip install pygame
->>>>>>> Updated README file

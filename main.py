@@ -9,16 +9,16 @@ pygame.display.set_caption('Mini Golf')
 clock = pygame.time.Clock()
 
 # Crashed flag, telling us if game loop should end
-run = True
+crashed = False
 
 # Game loop
-while run:
+while not crashed:
 
     # Loop over logged events, once that happened
     for event in pygame.event.get():
         # If quit window event happened than break the game loop
         if event.type == pygame.QUIT:
-            run = False
+            crashed = True
 
         print(event)
 
@@ -30,6 +30,7 @@ while run:
     # How many frames per second are being run: 60 FPS
     clock.tick(60)
 
+# End of pygame instance
 pygame.quit()
 
 # Exit python application

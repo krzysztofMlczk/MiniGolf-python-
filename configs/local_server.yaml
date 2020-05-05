@@ -1,0 +1,4 @@
+name: "local"
+# REMEMBER NOT TO LEFT YOUR IP ADDRESS WHEN COMMITTING !!!
+server: "local_ip_address"
+port: 5555

@@ -14,7 +14,8 @@ class Cup:
 
     def ball_in(self, pos):
         distance = math.sqrt(((pos.x - self.position.x)**2) + ((pos.y - flipy(self.position.y))**2))
+        return distance < self.radius
 
     def draw(self, screen):
-        p = int(self.position.x), int(flipy(self.position.y))
+        p = int(self.position.x), int(self.position.y)
         pygame.draw.circle(screen, self.color, p, int(self.radius))

@@ -20,11 +20,11 @@ class App:
 
         # Setting up pymunk
         self.draw_options = pymunk.pygame_util.DrawOptions(self.screen)
-        self.dt = 1/50
+        self.dt = 1/120
         self.stepping = True
 
         # Setting up constant players
-        players = [(255, 255, 255)]
+        players = [(255, 255, 255), (0, 255, 0)]
 
         # Setting up scenes and choosing first
         App.scenes.append(GameScene(players))
@@ -42,9 +42,7 @@ class App:
                 App.current.handle_event(event)
 
             # Removing shapes from space
-            for s in App.current.space.shapes:
-                if s.body.position.y < -100:
-                    App.current.space.remove(s)
+            #App.current.remove()
 
             # Drawing updated scene
             self.draw()

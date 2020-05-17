@@ -1,34 +1,57 @@
+import pymunk
 
 
 # Class responsible for holding the list of all objects on the scene
 # and updating them. Self registration is enabled by default, that means
 # each newly created objects is automatically being registered.
 class ObjectManager:
-    objects = []
-    gui_elements = []
+    def __init__(self, space):
+        self.objects = []
+        self.space = space
 
-    @classmethod
-    def register_object(cls, obj):
-        cls.objects.append(obj)
+    def register_object(self, obj):
+        self.objects.append(obj)
 
-    @classmethod
-    def destroy_object(cls, obj):
-        cls.objects.remove(obj)
+        if obj.shape is not None:
+            if obj.shape.body.body_type == pymunk.Body.STATIC:
+                self.space.add(obj.shape)
+            else:
+                self.space.add(obj.shape, obj.shape.body)
 
-    @classmethod
-    def register_gui_elem(cls, elem):
-        cls.gui_elements.append(elem)
+    def destroy_object(self, obj):
+        if obj not in self.objects:
+            return
 
-    @classmethod
-    def destroy_gui_elem(cls, elem):
-        cls.gui_elements.remove(elem)
+        self.objects.remove(obj)
 
-    @classmethod
-    def update_objects(cls, display):
-        for obj in cls.objects:
-            obj.update(display)
+        if obj.shape is not None:
+            if obj.shape.body.body_type == pymunk.Body.STATIC:
+                self.space.remove(obj.shape)
+            else:
+                self.space.remove(obj.shape, obj.shape.body)
 
-    @classmethod
-    def update_gui(cls, display):
-        for elem in cls.gui_elements:
-            elem.update(display)
+    def destroy_all_objects(self):
+        while self.objects:
+            self.destroy_object(self.objects[0])
+
+    def update_objects(self):
+        for obj in self.objects:
+            obj.update()
+
+    def draw_objects(self, display):
+        for obj in self.objects:
+            obj.draw(display)
+
+    def move_to_front(self, obj):
+        try:
+            index = self.objects.index(obj)
+            self.objects[index], self.objects[-1] = self.objects[-1], self.objects[index]
+        except ValueError:
+            pass
+
+    def move_to_back(self, obj):
+        try:
+            index = self.objects.index(obj)
+            self.objects[index], self.objects[0] = self.objects[0], self.objects[index]
+        except ValueError:
+            pass

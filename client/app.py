@@ -32,9 +32,6 @@ class App:
         # Loading Resources
         ResourcesManager.load_from_disk()
 
-        # Setting up constant players
-        players = [(255, 255, 255), (0, 255, 0)]
-
         # Setting up scenes and choosing first
         App.scenes["Menu"] = MainMenuScene(self.screen)
         App.scenes["Game"] = GameScene()
@@ -44,22 +41,25 @@ class App:
         """Main app loop"""
         while self.running:
 
-            # Delegating event handling to current scene
+            # Handling mutual events for all scenes
             for event in pygame.event.get():
                 if event.type == QUIT:
                     self.running = False
 
                 if event.type == pygame.VIDEORESIZE:
                     width, height = event.size
+
                     if width < 600:
                         width = 600
                     if height < 400:
                         height = 400
 
-                    client.utils.screen_size = (width, height)
                     self.screen = pygame.display.set_mode((width, height), HWSURFACE | DOUBLEBUF | RESIZABLE)
+
+                    client.utils.screen_size = (width, height)
                     App.current_scene.gui_mgr.resize_gui(self.screen)
 
+                # Delegating specific event handling to current scene
                 App.current_scene.handle_event(event)
 
             # Processing step in simulation
@@ -69,7 +69,8 @@ class App:
             # Drawing updated scene
             self.draw()
 
-            self.next_scene(self.current_scene.next)
+            # Checking if new scene should be loaded
+            self.next_scene()
 
         pygame.quit()
 
@@ -85,9 +86,11 @@ class App:
         App.current_scene.draw(self.screen)
         pygame.display.flip()
 
-    def next_scene(self, next_index):
-        if next_index in App.scenes.keys():
-            self.stepping = True
-            App.current_scene = App.scenes[next_index]
-            App.current_scene.setup(players=[(255, 255, 255), (0, 255, 0)])
+    def next_scene(self):
+        change_scene = App.current_scene.change_scene
+        if change_scene and change_scene.scene_id in App.scenes.keys():
 
+            if change_scene.scene_id == "Game":
+                self.stepping = True
+                App.current_scene = App.scenes["Game"]
+                App.current_scene.setup(**change_scene.kwargs)

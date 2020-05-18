@@ -6,31 +6,26 @@ from client.utils import flip_coords
 from client.maps.Map import Map
 from client.scenes.Scene import Scene
 from client.enums.ball_state_enum import BallState
+from client.objects.Ball import Ball
 
 
-# This is the scene that represents each single level:
 class GameScene(Scene):
     """Scene for drawing and handling game events"""
+
     def __init__(self):
         super().__init__(pymunk.Space())
-        self.next = None
         self.map = None
         self.players = None
-
-        # We need a custom collision handler for ball here:
-        # self.object_mgr.space.add_collision_handler(1, 2).pre_solve = self.ball_in_cup
-
         self.trajectory = None
         self.next_turn = None
-
-        # self.map.balls[0].turn = None
+        self.change_scene = None
 
     def draw(self, screen):
         """Draw scene and change ball if required"""
 
         # Draw balls
-        for ball in self.map.balls:
-            ball.draw(screen)
+        for player in self.players:
+            player.ball.draw(screen)
 
         # Draw trajectory when aiming
         if self.trajectory:
@@ -38,20 +33,26 @@ class GameScene(Scene):
 
         # Switch turn
         if self.balls_not_moving():
-            if self.next_turn or self.current_ball().state is BallState.IN_CUP:
-                self.next_ball()
+            if self.next_turn or self.current_player().ball.state is BallState.IN_CUP:
+                self.next_player()
 
+        # Update map and draw it
         self.object_mgr.update_objects()
         self.object_mgr.draw_objects(screen)
 
     def handle_event(self, event):
+        """Handling specific scene events"""
+
         if event.type == pygame.MOUSEBUTTONDOWN:
+
             if event.button == pygame.BUTTON_LEFT:
+
                 # Find ball that was clicked if none than omit
                 event_pos = flip_coords(event.pos)
                 ball = self.clicked_ball(Vec2d(event_pos[0], event_pos[1]))
 
                 if ball:
+
                     # If its ball's turn and all balls are still, let the ball be clicked to hit
                     if ball.turn and self.balls_not_moving():
                         pos = ball.shape.body.position
@@ -59,25 +60,34 @@ class GameScene(Scene):
                         ball.state = BallState.CLICKED
 
         elif event.type == pygame.MOUSEBUTTONUP:
-            # Get current ball
-            ball = self.current_ball()
 
-            if ball.state is BallState.CLICKED:
+            # Get current player
+            player = self.current_player()
+
+            if player.ball.state is BallState.CLICKED:
                 self.trajectory = None
 
                 if event.button == pygame.BUTTON_LEFT:
-                    direction = 5*Vec2d(
-                        ball.shape.body.position.x - flip_coords(event.pos)[0],
-                        ball.shape.body.position.y - flip_coords(event.pos)[1]
-                    )
-                    ball.shape.body.apply_impulse_at_local_point(direction)
-                    self.next_turn = True
-                else:
-                    ball.state = BallState.NOT_MOVING
 
-        elif event.type == pygame.MOUSEMOTION:
-            if self.trajectory:
-                self.trajectory[1] = pygame.mouse.get_pos()
+                    direction = 5*Vec2d(
+                        player.ball.shape.body.position.x - flip_coords(event.pos)[0],
+                        player.ball.shape.body.position.y - flip_coords(event.pos)[1]
+                    )
+
+                    player.ball.shape.body.apply_impulse_at_local_point(direction)
+                    self.next_turn = True
+
+                    # Adding points
+                    if str(self.map.id) in player.points.keys():
+                        player.points[str(self.map.id)] += 1
+                    else:
+                        player.points[str(self.map.id)] = 1
+
+                else:
+                    player.ball.state = BallState.NOT_MOVING
+
+        elif event.type == pygame.MOUSEMOTION and self.trajectory:
+            self.trajectory[1] = pygame.mouse.get_pos()
 
     def remove(self, ball):
         """Removing ball from space"""
@@ -86,32 +96,32 @@ class GameScene(Scene):
 
     def clicked_ball(self, pos):
         """Get clicked ball, only if its turn"""
-        for ball in self.map.balls:
-            if ball.is_clicked(pos) and ball.turn:
-                return ball
+        for player in self.players:
+            if player.ball.is_clicked(pos) and player.ball.turn:
+                return player.ball
 
         return None
 
-    def current_ball(self):
-        """Get current ball to strike"""
-        ball = [ball for ball in self.map.balls if ball.turn]
-        return ball[0]
+    def current_player(self):
+        """Get current player to strike"""
+        player = [player for player in self.players if player.ball.turn]
+        return player[0]
 
-    def next_ball(self):
-        """Change turn for next ball"""
-        current_ball = self.current_ball()
-        current_ball.turn = False
+    def next_player(self):
+        """Change turn for next player"""
+        current_player = self.current_player()
+        current_player.ball.turn = False
 
         # Choose next player
-        tries = len(self.map.balls)
-        next_id = (self.map.balls.index(current_ball) + 1) % len(self.map.balls)
+        tries = len(self.players)
+        next_id = (self.players.index(current_player) + 1) % len(self.players)
 
-        while self.map.balls[next_id].state is BallState.IN_CUP and tries > 0:
-            next_id = (next_id + 1) % len(self.map.balls)
+        while self.players[next_id].ball.state is BallState.IN_CUP and tries > 0:
+            next_id = (next_id + 1) % len(self.players)
             tries -= 1
 
         if tries > 0:
-            self.map.balls[next_id].turn = True
+            self.players[next_id].ball.turn = True
             self.next_turn = False
             print("Player {} to move".format(next_id))
 
@@ -127,41 +137,45 @@ class GameScene(Scene):
         self.object_mgr.destroy_all_objects()
 
         # Currently showing the same map again
-        self.map = Map(self.players, self.object_mgr)
+        self.map = Map(self.object_mgr)
 
         # Resetting balls and adding them back to simulation space
-        for i, ball in enumerate(self.map.balls):
-            ball.state = BallState.NOT_MOVING
-            ball.shape.body.position = Vec2d(300, 540 + 10 * i)
-            ball.shape.body.velocity = Vec2d(0.0, 0.0)
+        for player in self.players:
+            player.ball.state = BallState.NOT_MOVING
+            player.ball.shape.body.position = Vec2d(300, 540 + 10)
+            player.ball.shape.body.velocity = Vec2d(0.0, 0.0)
+            self.object_mgr.register_object(player.ball)
+            print("Player {} points: {}".format(player.id, player.points))
 
         self.next_turn = False
 
         # Setting up first player
-        self.map.balls[0].turn = True
+        self.players[0].ball.turn = True
         print("Player 0 to move")
 
     def balls_not_moving(self):
         """Check if all balls are still"""
-        for ball in self.map.balls:
-            if ball.state is BallState.MOVING or ball.state is BallState.CLICKED:
+        for player in self.players:
+            if player.ball.state is BallState.MOVING or player.ball.state is BallState.CLICKED:
                 return False
 
         return True
 
     def ball_in_cup(self, arbiter, space, data):
-        for ball in self.map.balls:
-            if self.map.cup.ball_in(ball.shape.body.position) and ball.state is not BallState.IN_CUP:
-                print("Ball {} in a cup".format(ball.id))
-                self.remove(ball)
+        for player in self.players:
+            if self.map.cup.ball_in(player.ball.shape.body.position) and player.ball.state is not BallState.IN_CUP:
+                print("Ball {} in a cup".format(player.id))
+                self.remove(player.ball)
 
         # We ignore the collision:
         return False
 
     def setup(self, players=None, **kwargs):
-        self.next = None
-        self.map = Map(players, self.object_mgr)
         self.players = players
+        self.map = Map(self.object_mgr)
+
+        for player in self.players:
+            player.ball = Ball((300, 540), (32, 32), color=player.color, obj_mgr=self.object_mgr)
 
         # We need a custom collision handler for ball here:
         self.object_mgr.space.add_collision_handler(1, 2).pre_solve = self.ball_in_cup
@@ -169,5 +183,5 @@ class GameScene(Scene):
         self.trajectory = None
         self.next_turn = False
 
-        self.map.balls[0].turn = True
+        self.players[0].ball.turn = True
         print("Player 0 to move")

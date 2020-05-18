@@ -14,10 +14,11 @@ from client.utils import sign
 
 
 class Ball(Object):
-    def __init__(self, position, dimension, id, obj_mgr):
-        image = ResourcesManager.get_image('obj_ball_pink')
+    def __init__(self, position, dimension, obj_mgr, color):
+        image = ResourcesManager.get_image('obj_ball_' + color)
         self.radius = dimension[0] / 2
-        super().__init__(position, dimension, image, id=id, obj_mgr=obj_mgr)
+
+        super().__init__(position, dimension, image, obj_mgr=obj_mgr)
 
         self.turn = False
         self.state = BallState.NOT_MOVING

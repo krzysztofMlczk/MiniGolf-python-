@@ -10,9 +10,10 @@ from client.objects.particles.ParticlesFire import ParticlesFire
 
 
 class Map:
-    def __init__(self, player, obj_mgr):
+    def __init__(self, obj_mgr):
         # TODO
         # Upload map from file by index, perhaps some loader required
+        self.id = 1
 
         SurfaceGrass((0, 0), (64, 64), obj_mgr=obj_mgr)
         SurfaceIce((300, 0), (64, 64), obj_mgr=obj_mgr)
@@ -22,8 +23,3 @@ class Map:
         self.cup = ObjectCup((700, 340), (48, 48), obj_mgr=obj_mgr)
         ObstacleBrickWallSegment((150, 150), (63, 64), obj_mgr=obj_mgr)
         ObstacleRock((500, 500), (128, 128), obj_mgr=obj_mgr)
-
-        self.balls = [
-            Ball((300, 540 + 10 * i), (32, 32), id=i, obj_mgr=obj_mgr)
-            for i, color in enumerate(player)
-        ]

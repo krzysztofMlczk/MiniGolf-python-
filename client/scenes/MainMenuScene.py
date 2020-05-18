@@ -12,7 +12,7 @@ class MainMenuScene(Scene):
     def __init__(self, screen):
         super().__init__(None)
         self.setup_components()
-        self.next = None
+        self.change_scene = None
 
         self.gui_mgr.resize_gui(screen)
 
@@ -82,15 +82,16 @@ class MainMenuScene(Scene):
 
     def handle_event(self, event):
         for elem in self.gui_mgr.gui_elements:
+
             # Buttons:
             if isinstance(elem, Button):
                 if elem.get_rect().collidepoint(pygame.mouse.get_pos()):
+
                     # Mouse click:
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         elem.on_mouse_clicked()
                     elif event.type == pygame.MOUSEBUTTONUP:
-                        if elem.on_mouse_released():
-                            self.next = "Game"
+                        self.change_scene = elem.on_mouse_released()
                     else:
                         elem.on_mouse_enter()
                 else:

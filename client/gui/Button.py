@@ -1,11 +1,14 @@
 import pygame
 
 from client.gui.GUIElement import GUIElement
+from client.models.scene_init import SceneInit
+from client.models.player import Player
 
 
 class Button(GUIElement):
     def __init__(self, name, dimension, position, image, image_hover, obj_mgr, default_res=None):
         super().__init__(position, dimension, image, name, obj_mgr, default_res)
+
         self.image_default_original = image
         self.image_hover_original = image_hover
 
@@ -30,15 +33,43 @@ class Button(GUIElement):
         if self.clicked:
             self.clicked = False
             self.position = (self.position[0] - 1, self.position[1] - 1)
-            return True
-        return False
+
+            if self.name == "single":
+                players = [Player(0, "yellow")]
+                scene_init = SceneInit("Game", players=players)
+
+            elif self.name == "multi":
+                # TODO
+                # Show screen to choose number of players
+                players = [
+                    Player(0, "orange"),
+                    Player(1, "blue")
+                ]
+                scene_init = SceneInit("Game", players=players)
+
+            elif self.name == "options":
+                scene_init = None
+
+            elif self.name == "about":
+                scene_init = None
+
+            else:
+                scene_init = None
+
+            return scene_init
+
+        return None
 
     def on_scr_resize(self, new_screen):
+
+        # Getting new screen size
         new_size = new_screen.get_size()
 
+        # Calculating ratio
         x_ratio = new_size[0] / self.old_scr_size[0]
         y_ratio = new_size[1] / self.old_scr_size[1]
 
+        # Calculating new center
         center = (self.position[0] + self.image.get_width() // 2,
                   self.position[1] + self.image.get_height() // 2)
 
@@ -47,6 +78,7 @@ class Button(GUIElement):
         dimension = (round(self.image.get_width() * x_ratio), round(self.image.get_height() * y_ratio))
         self.position = (center[0] - dimension[0] // 2, center[1] - dimension[1] // 2)
 
+        # Scaling images
         self.image_default = pygame.transform.scale(self.image_default_original, dimension)
         self.image_hover = pygame.transform.scale(self.image_hover_original, dimension)
         self.image = pygame.transform.scale(self.image_original, dimension)

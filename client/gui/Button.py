@@ -47,11 +47,11 @@ class Button(GUIElement):
                 ]
                 scene_init = SceneInit("Game", players=players)
 
-            elif self.name == "options":
-                scene_init = None
-
             elif self.name == "about":
                 scene_init = None
+
+            elif self.name == "quit":
+                exit(0)
 
             else:
                 scene_init = None

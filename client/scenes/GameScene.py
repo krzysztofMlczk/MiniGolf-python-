@@ -199,6 +199,6 @@ class GameScene(Scene):
         print("Player 0 to move")
 
     def search_for_maps(self):
-        levels = map_search('./client/levels')
+        levels = map_search('./levels')
         for lvl in levels:
             self.loader.add_map_file(lvl)

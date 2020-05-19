@@ -65,7 +65,7 @@ class MainMenuScene(Scene):
         )
 
         # setup buttons
-        button_names = ["single", "multi", "options", "about"]
+        button_names = ["single", "multi", "about", "quit"]
         button_size = (416, 98)
         offset = 30
 

@@ -2,11 +2,14 @@ import pygame
 import pymunk
 from pymunk import Vec2d
 
+from client.models.scene_init import SceneInit
 from client.utils import flip_coords
 from client.maps.Map import Map
 from client.scenes.Scene import Scene
 from client.enums.ball_state_enum import BallState
 from client.objects.Ball import Ball
+from client.maps.map_loader import Loader
+from client.maps.map_search import map_search
 
 
 class GameScene(Scene):
@@ -14,6 +17,8 @@ class GameScene(Scene):
 
     def __init__(self):
         super().__init__(pymunk.Space())
+        self.loader = Loader(self.object_mgr)
+        self.next = None
         self.map = None
         self.players = None
         self.trajectory = None
@@ -137,7 +142,13 @@ class GameScene(Scene):
         self.object_mgr.destroy_all_objects()
 
         # Currently showing the same map again
-        self.map = Map(self.object_mgr)
+        # self.map = Map(self.players, self.object_mgr)
+        next_map_details = self.loader.next_map()
+        if next_map_details:
+            self.map = Map(*self.loader.next_map())
+        else:
+            self.change_scene = SceneInit("Menu")
+            return
 
         # Resetting balls and adding them back to simulation space
         for player in self.players:
@@ -172,7 +183,8 @@ class GameScene(Scene):
 
     def setup(self, players=None, **kwargs):
         self.players = players
-        self.map = Map(self.object_mgr)
+        self.search_for_maps()
+        self.map = Map(*self.loader.next_map())
 
         for player in self.players:
             player.ball = Ball((300, 540), (32, 32), color=player.color, obj_mgr=self.object_mgr)
@@ -185,3 +197,8 @@ class GameScene(Scene):
 
         self.players[0].ball.turn = True
         print("Player 0 to move")
+
+    def search_for_maps(self):
+        levels = map_search('./client/levels')
+        for lvl in levels:
+            self.loader.add_map_file(lvl)

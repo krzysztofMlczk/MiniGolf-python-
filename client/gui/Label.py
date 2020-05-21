@@ -18,3 +18,4 @@ class Label(GUIElement):
 
         self.image = pygame.transform.scale(self.image_original, dimension)
         self.old_scr_size = new_size
+

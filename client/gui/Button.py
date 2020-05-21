@@ -29,7 +29,7 @@ class Button(GUIElement):
         self.clicked = True
         self.position = (self.position[0] + 1, self.position[1] + 1)
 
-    def on_mouse_released(self):
+    def on_mouse_released(self, players=None):
         if self.clicked:
             self.clicked = False
             self.position = (self.position[0] - 1, self.position[1] - 1)
@@ -39,13 +39,13 @@ class Button(GUIElement):
                 scene_init = SceneInit("Game", players=players)
 
             elif self.name == "multi":
-                # TODO
-                # Show screen to choose number of players
-                players = [
-                    Player(0, "orange"),
-                    Player(1, "blue")
-                ]
-                scene_init = SceneInit("Game", players=players)
+                scene_init = SceneInit("MultiSetup")
+
+            elif self.name == "players_up" or self.name == "maps_up":
+                return 1
+
+            elif self.name == "players_down" or self.name == "maps_down":
+                return -1
 
             elif self.name == "about":
                 scene_init = None

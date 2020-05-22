@@ -6,7 +6,6 @@ from pymunk import Vec2d
 
 from client.objects.Object import Object
 from client.objects.Surface import Surface
-from client.objects.SurfaceLava import SurfaceLava
 from client.objects.particles.ParticlesFire import ParticlesFire
 from client.resources.ResourcesManager import ResourcesManager
 from client.enums.ball_state_enum import BallState
@@ -18,7 +17,7 @@ class Ball(Object):
         image = ResourcesManager.get_image('obj_ball_' + color)
         self.radius = dimension[0] / 2
 
-        super().__init__(position, dimension, image, obj_mgr=obj_mgr, obj_type='dynamic')
+        super().__init__(position, dimension, image, obj_mgr=obj_mgr, name='ball', obj_type='dynamic')
 
         self.turn = False
         self.state = BallState.NOT_MOVING
@@ -36,12 +35,12 @@ class Ball(Object):
 
             surf = self.get_surface()
 
-            if isinstance(surf, SurfaceLava) and self.particles_effect is None:
+            if surf is not None and surf.name == 'lava' and self.particles_effect is None:
                 self.particles_effect = ParticlesFire(None, (32, 32), follow=self, obj_mgr=self.object_mgr)
 
             if surf is not None:
                 # Let the surface change the velocity:
-                velocity = surf.velocity_func(body.velocity)
+                velocity = surf.velocity_func(body.velocity, surf.friction)
             else:
                 # Calculating friction vector
                 friction_vec = -default_friction * body.velocity / math.hypot(body.velocity.x, body.velocity.y)
@@ -69,7 +68,7 @@ class Ball(Object):
 
             if body.velocity == Vec2d(0.0, 0.0):
                 if self.state is not BallState.CLICKED:
-                    if isinstance(self.get_surface(), SurfaceLava):
+                    if self.get_surface() is not None and self.get_surface().name == 'lava':
                         self.shape.body.position = self.last_pos
 
                     self.state = BallState.NOT_MOVING

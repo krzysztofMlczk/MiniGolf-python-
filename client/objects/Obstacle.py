@@ -13,10 +13,10 @@ from client.utils import flip_coords
 
 
 class Obstacle(Object):
-    def __init__(self, pos, dimension, image, elasticity, obj_mgr, id=-1):
+    def __init__(self, pos, dimension, image, elasticity, obj_mgr, id=-1, name=''):
         self.offset = None
         self.elasticity = elasticity
-        super().__init__(pos, dimension, image, id, obj_mgr=obj_mgr)
+        super().__init__(pos, dimension, image, id, name=name, obj_mgr=obj_mgr)
 
     def prepare_body(self, position):
         body = pymunk.body.Body(body_type=pymunk.Body.STATIC)

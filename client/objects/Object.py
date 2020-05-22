@@ -5,11 +5,12 @@ from client.utils import flip_coords
 
 # Base class of all objects on the scene.
 class Object(pygame.sprite.Sprite):
-    def __init__(self, position, dimension, image, id=-1, obj_mgr=None, obj_type='static'):
+    def __init__(self, position, dimension, image, id=-1, name='', obj_mgr=None, obj_type='static'):
         super().__init__()
 
         self.image = pygame.transform.scale(image, dimension)
         self.id = id
+        self.name = name
         self.shape = self.prepare_body(flip_coords(position))
         self.object_mgr = obj_mgr
         self.type = obj_type

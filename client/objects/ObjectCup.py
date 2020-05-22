@@ -10,7 +10,7 @@ class ObjectCup(Object):
     def __init__(self, position, dimension, obj_mgr, id=-1):
         image = ResourcesManager.get_image('obj_hole')
         self.radius = dimension[0] / 2
-        super().__init__(position, dimension, image, id=id, obj_mgr=obj_mgr)
+        super().__init__(position, dimension, image, id=id, name='cup', obj_mgr=obj_mgr)
 
     def prepare_body(self, position):
         body = pymunk.body.Body(1, pymunk.inf, body_type=pymunk.Body.STATIC)

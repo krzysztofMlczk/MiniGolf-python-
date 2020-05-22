@@ -22,6 +22,9 @@ class GUIElement(pygame.sprite.Sprite):
     def set_image(self, image):
         self.image = image
 
+    def set_image_original(self, image):
+        self.image_original = image
+
     def set_visible(self, b):
         self.visible = b
 
@@ -38,7 +41,7 @@ class GUIElement(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image_original, dimension)
 
     def get_size(self):
-        return self.image.get_width, self.image.get_height
+        return self.image.get_width(), self.image.get_height()
 
     def draw(self, display):
         if self.old_scr_size is None:

@@ -11,9 +11,10 @@ from client.models.player import Player
 
 
 class MultiSetupScene(Scene):
-    avaliable_colors = ["yellow", "orange", "blue", "pink", "white"]
-    avaliable_players_id = [0, 1, 2, 3, 4]
     """Scene for drawing scene for setting up multiplayer game"""
+
+    available_colors = ["yellow", "orange", "blue", "pink", "white"]
+    available_players_id = [0, 1, 2, 3, 4]
 
     def __init__(self, screen):
         super().__init__(None)
@@ -76,6 +77,7 @@ class MultiSetupScene(Scene):
         # setup labels
         etiquette_size = (416, 100)
         numbers_size = (100, 100)
+
         # label which displays title "Players: "
         players_label = Label(
             name="players_label",
@@ -218,28 +220,31 @@ class MultiSetupScene(Scene):
         self.gui_mgr.draw_gui(screen)
 
     def add_player(self):
-        player_id = self.avaliable_players_id.pop(0)
-        color = random.choice(self.avaliable_colors)
-        self.avaliable_colors.remove(color)
+        player_id = self.available_players_id.pop(0)
+        color = random.choice(self.available_colors)
+        self.available_colors.remove(color)
         self.players.append(Player(player_id, color))
 
     def remove_player(self):
         # always remove latest added player
         to_remove = self.players.pop()
-        self.avaliable_players_id.append(to_remove.id)
-        self.avaliable_colors.append(to_remove.color)
+        self.available_players_id.append(to_remove.id)
+        self.available_colors.append(to_remove.color)
 
     def update_images(self):
         """function to change numbers while clicking on up/down buttons"""
         for element in self.gui_mgr.gui_elements:
             if isinstance(element, Label):
-                new_image = None
+
                 if element.name == "players_amount":
                     new_image = ResourcesManager.get_image("amount_" + str(self.players_amount))
-                    element.set_image(new_image)
+                    element.set_image_original(new_image)
+                    element.set_size(element.get_size())
+
                 elif element.name == "maps_amount":
                     new_image = ResourcesManager.get_image("amount_" + str(self.maps_to_play))
-                    element.set_image(new_image)
+                    element.set_image_original(new_image)
+                    element.set_size(element.get_size())
 
 
 

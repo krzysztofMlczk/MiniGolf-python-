@@ -47,6 +47,12 @@ class Button(GUIElement):
             elif self.name == "players_down" or self.name == "maps_down":
                 return -1
 
+            elif self.name == "play_btn":
+                scene_init = SceneInit("Game", players=players)
+
+            elif self.name == "cancel_btn":
+                scene_init = SceneInit("Menu")
+
             elif self.name == "about":
                 scene_init = None
 

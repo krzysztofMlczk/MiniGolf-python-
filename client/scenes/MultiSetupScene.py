@@ -1,4 +1,5 @@
 import pygame
+import random
 
 from client.gui.Label import Label
 from client.models.scene_init import SceneInit
@@ -6,9 +7,12 @@ from client.scenes.Scene import Scene
 from client.gui.Cloud import Cloud
 from client.gui.Button import Button
 from client.resources.ResourcesManager import ResourcesManager
+from client.models.player import Player
 
 
 class MultiSetupScene(Scene):
+    avaliable_colors = ["yellow", "orange", "blue", "pink", "white"]
+    avaliable_players_id = [0, 1, 2, 3, 4]
     """Scene for drawing scene for setting up multiplayer game"""
 
     def __init__(self, screen):
@@ -17,9 +21,11 @@ class MultiSetupScene(Scene):
         self.setup_components()
         self.change_scene = None
         self.players_amount = 2
-        self.players = []
         self.maps_to_play = 1
-
+        self.players = []
+        # we have 2 players by default
+        self.add_player()
+        self.add_player()
         self.gui_mgr.resize_gui(screen)
 
     def setup_components(self):
@@ -157,6 +163,28 @@ class MultiSetupScene(Scene):
             obj_mgr=self.gui_mgr,
             default_res=(width, height)
         )
+        # setup lower buttons
+        lower_button_size = (268, 100)
+
+        play_btn = Button(
+            name="play_btn",
+            dimension=lower_button_size,
+            position=(1000, 767),
+            image=ResourcesManager.get_image("btn_play"),
+            image_hover=ResourcesManager.get_image("btn_play_hover"),
+            obj_mgr=self.gui_mgr,
+            default_res=(width, height)
+        )
+
+        cancel_btn = Button(
+            name="cancel_btn",
+            dimension=lower_button_size,
+            position=(702, 767),
+            image=ResourcesManager.get_image("btn_cancel"),
+            image_hover=ResourcesManager.get_image("btn_cancel_hover"),
+            obj_mgr=self.gui_mgr,
+            default_res=(width, height)
+        )
 
     def handle_event(self, event):
         for elem in self.gui_mgr.gui_elements:
@@ -178,9 +206,9 @@ class MultiSetupScene(Scene):
                                 self.players_amount += outcome
                                 self.remove_player()
                             elif elem.name == "maps_up" and self.maps_to_play < 5:
-                                self.maps_to_play += outcome
+                                self.maps_to_play += 1
                             elif elem.name == "maps_down" and self.maps_to_play > 1:
-                                self.maps_to_play += outcome
+                                self.maps_to_play -= 1
                     else:
                         elem.on_mouse_enter()
                 else:
@@ -190,12 +218,6 @@ class MultiSetupScene(Scene):
         self.update_images()
         self.gui_mgr.update_gui()
         self.gui_mgr.draw_gui(screen)
-
-    def add_player(self):
-        pass
-
-    def remove_player(self):
-        pass
 
     def update_images(self):
         """function to change numbers while clicking on up/down buttons"""
@@ -208,7 +230,6 @@ class MultiSetupScene(Scene):
                 elif element.name == "maps_amount":
                     new_image = ResourcesManager.get_image("amount_" + str(self.maps_to_play))
                     element.set_image(new_image)
-
 
     def setup(self, **kwargs):
         pass

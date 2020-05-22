@@ -4,14 +4,15 @@ from client.objects.Object import Object
 
 
 class Surface(Object):
-    def __init__(self, position, dimension, image, friction, id=-1, obj_mgr=None):
+    def __init__(self, position, dimension, image, friction, velocity_func, obj_mgr=None, id=-1):
         self.friction = friction
         self.position = position
-        super().__init__(position, dimension, image, id=-1, obj_mgr=obj_mgr)
+        self.velocity_func = velocity_func
+        super().__init__(position, dimension, image, id=id, obj_mgr=obj_mgr)
 
     def get_rect(self):
         return pygame.Rect(self.position[0], self.position[1],
                            self.image.get_width(), self.image.get_height())
 
-    def change_velocity(self, vel):
-        pass
+    def draw(self, display):
+        display.blit(self.image, self.position)

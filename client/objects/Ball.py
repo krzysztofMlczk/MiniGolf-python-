@@ -41,7 +41,7 @@ class Ball(Object):
 
             if surf is not None:
                 # Let the surface change the velocity:
-                velocity = surf.change_velocity(body.velocity)
+                velocity = surf.velocity_func(body.velocity)
             else:
                 # Calculating friction vector
                 friction_vec = -default_friction * body.velocity / math.hypot(body.velocity.x, body.velocity.y)

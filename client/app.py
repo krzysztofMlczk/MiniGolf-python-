@@ -85,8 +85,8 @@ class App:
 
         # To turn on debug mode on pure simulation underneath
         # uncomment line below and comment one after
-        if isinstance(App.current_scene, GameScene):
-            App.current_scene.object_mgr.space.debug_draw(self.draw_options)
+        # if isinstance(App.current_scene, GameScene):
+        #    App.current_scene.object_mgr.space.debug_draw(self.draw_options)
 
         App.current_scene.draw(self.screen)
         pygame.display.flip()

@@ -45,13 +45,20 @@ class EditorScene(Scene):
 
                 if clicked_toolbox is not None:
                     self.curr_obj = clicked_toolbox
-                elif clicked_tile_index is not None:
-                    self.grid[clicked_tile_index] = (self.grid[clicked_tile_index][0], self.curr_obj)
+                elif clicked_tile_index is not None and self.grid[clicked_tile_index][1] is None:
+                    self.grid[clicked_tile_index] = (self.grid[clicked_tile_index][0], self.curr_obj, 0)
 
             elif event.button == pygame.BUTTON_RIGHT:
                 clicked_tile_index = self.get_grid_tile(mouse_pos)
                 if clicked_tile_index is not None:
-                    self.grid[clicked_tile_index] = (self.grid[clicked_tile_index][0], None)
+                    self.grid[clicked_tile_index] = (self.grid[clicked_tile_index][0], None, 0)
+
+            elif event.button == pygame.BUTTON_MIDDLE:
+                clicked_tile_index = self.get_grid_tile(mouse_pos)
+                if clicked_tile_index is not None and self.grid[clicked_tile_index][1] is not None:
+                    self.grid[clicked_tile_index] = (self.grid[clicked_tile_index][0],
+                                                     self.grid[clicked_tile_index][1],
+                                                     (self.grid[clicked_tile_index][2] + 90) % 360)
 
         elif event.type == pygame.MOUSEBUTTONUP:
             pass
@@ -63,7 +70,7 @@ class EditorScene(Scene):
         for x in range(0, width * block_size, block_size):
             for y in range(0, height * block_size, block_size):
                 rect = pygame.Rect(x, y, block_size, block_size)
-                self.grid.append((rect, None))
+                self.grid.append((rect, None, 0))
 
         self.grid_size = (dim[0] * block_size, dim[1] * block_size)
 
@@ -71,7 +78,7 @@ class EditorScene(Scene):
         for i in range(len(self.grid)):
             tile = self.grid[i]
             self.grid[i] = (pygame.Rect(tile[0][0] + offset[0], tile[0][1] + offset[1],
-                                        tile[0][2], tile[0][3]), tile[1])
+                                        tile[0][2], tile[0][3]), tile[1], tile[2])
         self.grid_pos = (self.grid[0][0][0], self.grid[0][0][1])
 
     def draw_grid(self, screen):
@@ -79,7 +86,7 @@ class EditorScene(Scene):
             if tile[1] is None or tile[1][0] is None:
                 pygame.draw.rect(screen, (255, 255, 255), tile[0], 1)
             else:
-                screen.blit(tile[1][0], (tile[0][0], tile[0][1]))
+                screen.blit(pygame.transform.rotate(tile[1][0], tile[2]), (tile[0][0], tile[0][1]))
 
     def move_camera(self, mouse_pos):
         cam_mv = (0, 0)

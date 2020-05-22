@@ -14,7 +14,8 @@ class ResourcesManager:
         for root, dirnames, filenames in os.walk('./resources'):
             for filename in filenames:
                 if filename.endswith(('.jpg', '.png', '.bmp', '.mp3')):
-                    cls.images[os.path.splitext(filename)[0]] = pygame.image.load(os.path.join(root, filename))
+                    cls.images[os.path.splitext(filename)[0]] =\
+                        pygame.image.load(os.path.join(root, filename)).convert_alpha()
 
     @classmethod
     def get_image(cls, name):

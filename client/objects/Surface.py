@@ -23,9 +23,11 @@ class Surface(Object):
         display.blit(self.image, self.position)
 
     @classmethod
-    def from_template(cls, name, pos, dim, obj_mgr):
+    def from_template(cls, name, pos, dim, obj_mgr, horizontal=1, vertical=1, **kwargs):
         with open(template_dir + name + ".yaml") as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
 
-        return Surface(pos, dim, obj_mgr, **config)
-
+        for x in range(horizontal):
+            for y in range(vertical):
+                new_pos = pos[0] + x * dim[0], pos[1] + y * dim[1]
+                Surface(new_pos, dim, obj_mgr, **config)

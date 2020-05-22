@@ -37,8 +37,11 @@ class Obstacle(Object):
         display.blit(self.image, flip_coords(pos))
 
     @classmethod
-    def from_template(cls, name, pos, dim, obj_mgr):
+    def from_template(cls, name, pos, dim, obj_mgr, vertical=1, horizontal=1, **kwargs):
         with open(template_dir + name + ".yaml") as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
 
-        return Obstacle(pos, dim, obj_mgr, **config)
+        for x in range(horizontal):
+            for y in range(vertical):
+                new_pos = pos[0] + x * dim[0], pos[1] + y * dim[1]
+                Obstacle(new_pos, dim, obj_mgr, **config)

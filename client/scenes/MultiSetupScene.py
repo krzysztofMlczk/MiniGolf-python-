@@ -219,6 +219,18 @@ class MultiSetupScene(Scene):
         self.gui_mgr.update_gui()
         self.gui_mgr.draw_gui(screen)
 
+    def add_player(self):
+        player_id = self.avaliable_players_id.pop(0)
+        color = random.choice(self.avaliable_colors)
+        self.avaliable_colors.remove(color)
+        self.players.append(Player(player_id, color))
+
+    def remove_player(self):
+        # always remove latest added player
+        to_remove = self.players.pop()
+        self.avaliable_players_id.append(to_remove.id)
+        self.avaliable_colors.append(to_remove.color)
+
     def update_images(self):
         """function to change numbers while clicking on up/down buttons"""
         for element in self.gui_mgr.gui_elements:

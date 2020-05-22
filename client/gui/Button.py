@@ -39,7 +39,7 @@ class Button(GUIElement):
                 scene_init = SceneInit("Game", players=players)
 
             elif self.name == "multi":
-                scene_init = SceneInit("MultiSetup")
+                scene_init = SceneInit("MultiSetup", screen=self.get_current_screen())
 
             elif self.name == "players_up" or self.name == "maps_up":
                 return 1
@@ -51,10 +51,10 @@ class Button(GUIElement):
                 scene_init = SceneInit("Game", players=players)
 
             elif self.name == "cancel_btn":
-                scene_init = SceneInit("Menu")
+                scene_init = SceneInit("Menu", screen=self.get_current_screen())
 
             elif self.name == "about":
-                scene_init = None
+                scene_init = SceneInit("About", screen=self.get_current_screen())
 
             elif self.name == "quit":
                 exit(0)
@@ -90,3 +90,8 @@ class Button(GUIElement):
         self.image = pygame.transform.scale(self.image_original, dimension)
 
         self.old_scr_size = new_size
+
+    def get_current_screen(self):
+        info = pygame.display.Info()
+        return pygame.display.set_mode((info.current_w, info.current_h), pygame.RESIZABLE)
+

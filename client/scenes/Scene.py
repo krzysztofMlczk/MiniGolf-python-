@@ -23,4 +23,8 @@ class Scene:
         pass
 
     def setup(self, **kwargs):
-        pass
+        screen = None
+        for key, value in kwargs.items():
+            if key == "screen":
+                screen = value
+        self.gui_mgr.resize_gui(screen)

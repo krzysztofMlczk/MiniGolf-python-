@@ -1,24 +1,20 @@
 import pygame
 
-from client.gui.Label import Label
-from client.gui.Cloud import Cloud
 from client.gui.Button import Button
 from client.scenes.Scene import Scene
+from client.gui.Label import Label
 from client.resources.ResourcesManager import ResourcesManager
+from client.gui.Cloud import Cloud
 
 
-class MainMenuScene(Scene):
-    """Scene for drawing main menu game events"""
+class AboutScene(Scene):
     def __init__(self, screen):
         super().__init__(None)
-        self.setup_components()
         self.change_scene = None
-
-        self.gui_mgr.resize_gui(screen)
+        self.setup_components()
 
     def setup_components(self):
-        """setting up and registering(happens automatically) components"""
-
+        """Setting up and registering(happens automatically) components"""
         width, height = 1920, 1080
 
         # Setup up background, title and clouds
@@ -64,21 +60,26 @@ class MainMenuScene(Scene):
             default_res=(width, height)
         )
 
-        # setup buttons
-        button_names = ["single", "multi", "about", "quit"]
-        button_size = (416, 98)
-        offset = 30
+        # setup about label
+        about = Label(
+            name="about",
+            dimension=(500, 500),
+            position=(710, 450),
+            image=ResourcesManager.get_image("about_label"),
+            obj_mgr=self.gui_mgr,
+            default_res=(width, height)
+        )
 
-        for i, name in enumerate(button_names):
-            Button(
-                name=name,
-                dimension=button_size,
-                position=((width - button_size[0]) // 2 + offset, height // 2 + button_size[1] * (i - 1) + offset),
-                image=ResourcesManager.get_image(name),
-                image_hover=ResourcesManager.get_image(name + "_hover"),
-                obj_mgr=self.gui_mgr,
-                default_res=(width, height)
-            )
+        # setup buttons
+        cancel_btn = Button(
+            name="cancel_btn",
+            dimension=(134, 50),
+            position=(893, 870),
+            image=ResourcesManager.get_image("btn_cancel"),
+            image_hover=ResourcesManager.get_image("btn_cancel_hover"),
+            obj_mgr=self.gui_mgr,
+            default_res=(width, height)
+        )
 
     def handle_event(self, event):
         for elem in self.gui_mgr.gui_elements:
@@ -98,11 +99,9 @@ class MainMenuScene(Scene):
                     elem.on_mouse_quit()
 
     def draw(self, screen):
+        # resize before drawing (bug occurs when window was resized and then we click "about")
+        # self.gui_mgr.resize_gui(screen)
         self.gui_mgr.update_gui()
         self.gui_mgr.draw_gui(screen)
-
-
-
-
 
 

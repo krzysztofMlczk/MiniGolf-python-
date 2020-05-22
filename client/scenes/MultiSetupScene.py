@@ -19,14 +19,12 @@ class MultiSetupScene(Scene):
         super().__init__(None)
         self.change_scene = None
         self.setup_components()
-        self.change_scene = None
         self.players_amount = 2
         self.maps_to_play = 1
         self.players = []
         # we have 2 players by default
         self.add_player()
         self.add_player()
-        self.gui_mgr.resize_gui(screen)
 
     def setup_components(self):
         """Setting up and registering (happens automatically) components"""
@@ -243,5 +241,5 @@ class MultiSetupScene(Scene):
                     new_image = ResourcesManager.get_image("amount_" + str(self.maps_to_play))
                     element.set_image(new_image)
 
-    def setup(self, **kwargs):
-        pass
+
+

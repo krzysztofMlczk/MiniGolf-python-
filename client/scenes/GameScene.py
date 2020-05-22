@@ -71,7 +71,7 @@ class GameScene(Scene):
 
                 if event.button == pygame.BUTTON_LEFT:
 
-                    direction = 5*Vec2d(
+                    direction = 10*Vec2d(
                         player.ball.shape.body.position.x - flip_coords(event.pos)[0],
                         player.ball.shape.body.position.y - flip_coords(event.pos)[1]
                     )

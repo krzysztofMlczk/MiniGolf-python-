@@ -21,6 +21,7 @@ class App:
         # Setting up pygame
         pygame.init()
         info = pygame.display.Info()
+        self.clock = pygame.time.Clock()
         client.utils.screen_size = (info.current_w, info.current_h)
 
         self.screen = pygame.display.set_mode((info.current_w, info.current_h), pygame.RESIZABLE)
@@ -28,7 +29,7 @@ class App:
 
         # Setting up pymunk
         self.draw_options = pymunk.pygame_util.DrawOptions(self.screen)
-        self.dt = 1/80
+        self.dt = 1/120
         self.stepping = False
 
         # Loading Resources
@@ -76,6 +77,10 @@ class App:
 
             # Checking if new scene should be loaded
             self.next_scene()
+            self.clock.tick(120)
+
+            # Print fps
+            # print(self.clock.get_fps())
 
         pygame.quit()
 
@@ -89,6 +94,7 @@ class App:
         #    App.current_scene.object_mgr.space.debug_draw(self.draw_options)
 
         App.current_scene.draw(self.screen)
+
         pygame.display.flip()
 
     def next_scene(self):

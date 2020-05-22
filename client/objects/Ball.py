@@ -55,7 +55,7 @@ class Ball(Object):
                 velocity.y = 0.0
 
             # Establish maximum velocity
-            max_velocity = 800.0
+            max_velocity = 1800.0
 
             if math.fabs(velocity.x) > max_velocity:
                 velocity.x = max_velocity * sign(velocity.x)

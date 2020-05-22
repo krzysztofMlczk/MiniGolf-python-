@@ -27,3 +27,10 @@ def velocity_default(vel, friction):
 
     # Calculating new velocity with friction
     return vel + friction_vec
+
+
+def get_by_name(name):
+    if name == "default":
+        return velocity_default
+    elif name == "wobble":
+        return velocity_wobble

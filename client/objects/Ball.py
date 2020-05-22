@@ -1,5 +1,4 @@
 import math
-from time import time
 
 import pymunk
 from pymunk import Vec2d
@@ -25,7 +24,7 @@ class Ball(Object):
 
         self.particles_effect = None
 
-    def friction_velocity(self, body, gravity, damping, dt, default_friction=2):
+    def friction_velocity(self, body, gravity, damping, dt, default_friction=6):
         """Custom velocity function for pymunk body"""
         if self.state is BallState.IN_CUP:
             body.velocity = Vec2d(0.0, 0.0)

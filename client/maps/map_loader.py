@@ -1,9 +1,8 @@
 import json
+
 from client.objects.ObjectCup import ObjectCup
 from client.objects.Obstacle import Obstacle
 from client.objects.Surface import Surface
-from client.resources.ResourcesManager import ResourcesManager
-import client.objects.SurfaceVelocities as SurfaceVelocities
 
 
 class Loader(object):
@@ -37,25 +36,13 @@ class Loader(object):
         return Loader.map_info(raw)
 
     def map_from_info(self, level):
-        for bws in level['bws']:
-            Obstacle(bws['pos'], bws['dim'], ResourcesManager.get_image('wall_brick'), 0.8, self.obj_mgr, name='bws')
-        for rock in level['rock']:
-            Obstacle(rock['pos'], rock['dim'], ResourcesManager.get_image('obj_rock'), 0.5, self.obj_mgr, name='rock')
-        for dirt in level['dirt']:
-            Surface(dirt['pos'], dirt['dim'], ResourcesManager.get_image('surf_dirt'), 4.0,
-                    SurfaceVelocities.velocity_wobble, self.obj_mgr, name='dirt')
-        for ice in level['ice']:
-            Surface(ice['pos'], ice['dim'], ResourcesManager.get_image('surf_ice'), 1.0,
-                    SurfaceVelocities.velocity_default, self.obj_mgr, name='ice')
-        for grass in level['grass']:
-            Surface(grass['pos'], grass['dim'], ResourcesManager.get_image('surf_grass'), 3.0,
-                    SurfaceVelocities.velocity_default, self.obj_mgr, name='grass')
-        for lava in level['lava']:
-            Surface(lava['pos'], lava['dim'], ResourcesManager.get_image('surf_lava'), 5.0,
-                    SurfaceVelocities.velocity_default, self.obj_mgr, name='lava')
-        for triangle in level['triangle']:
-            Obstacle(triangle['pos'], triangle['dim'], ResourcesManager.get_image('wall_triangle_brick'), 0.5,
-                     self.obj_mgr, name=triangle)
-        cup = ObjectCup(level['cup']['pos'], level['cup']['dim'], self.obj_mgr)
-        id = level['id']
-        return id, cup
+
+        for obstacle in level["obstacles"]:
+            Obstacle.from_template(obj_mgr=self.obj_mgr, **obstacle)
+
+        for surface in level["surfaces"]:
+            Surface.from_template(obj_mgr=self.obj_mgr, **surface)
+
+        cup = ObjectCup(self.obj_mgr, **level['cup'], )
+
+        return level['id'], cup

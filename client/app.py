@@ -28,7 +28,7 @@ class App:
 
         # Setting up pymunk
         self.draw_options = pymunk.pygame_util.DrawOptions(self.screen)
-        self.dt = 1/120
+        self.dt = 1/80
         self.stepping = False
 
         # Loading Resources

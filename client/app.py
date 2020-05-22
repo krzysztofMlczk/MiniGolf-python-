@@ -17,11 +17,9 @@ class App:
     current_scene = None
 
     def __init__(self):
-
         # Setting up pygame
         pygame.init()
         info = pygame.display.Info()
-        client.utils.screen_size = (info.current_w, info.current_h)
 
         self.screen = pygame.display.set_mode((info.current_w, info.current_h), pygame.RESIZABLE)
         self.running = True

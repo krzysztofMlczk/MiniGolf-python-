@@ -1,26 +1,33 @@
 import pygame
 
-from client.objects.ObjectManager import ObjectManager
+from client.utils import flip_coords
 
 
 # Base class of all objects on the scene.
 class Object(pygame.sprite.Sprite):
-    def __init__(self, position, dimension, image, collision=True, noregister=False):
+    def __init__(self, position, dimension, image, id=-1, obj_mgr=None):
         super().__init__()
 
         self.image = pygame.transform.scale(image, dimension)
-        self.rect = dimension
-        self.position = position
-        self.collision = collision
-
-        if collision:
-            self.mask = pygame.mask.from_surface(self.image)
+        self.id = id
+        self.shape = self.prepare_body(flip_coords(position))
+        self.object_mgr = obj_mgr
 
         # Add newly created objects to the Object Manager, if not mentioned otherwise
-        if not noregister:
-            ObjectManager.register_object(self)
+        if obj_mgr is not None:
+            obj_mgr.register_object(self)
 
-    def draw(self, screen):
+    # For bodied objects only:
+    def get_position(self, pygame=False):
+        if pygame:
+            return flip_coords(self.shape.body.position)
+        else:
+            return self.shape.body.position
+
+    def prepare_body(self, position):
+        return None
+
+    def draw(self, display):
         pass
 
     def update(self):

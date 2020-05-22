@@ -4,9 +4,11 @@ import pymunk
 import pymunk.pygame_util
 
 import client.utils
+from client.scenes.AboutScene import AboutScene
 from client.scenes.GameScene import GameScene
 from client.resources.ResourcesManager import ResourcesManager
 from client.scenes.MainMenuScene import MainMenuScene
+from client.scenes.MultiSetupScene import MultiSetupScene
 
 
 class App:
@@ -34,8 +36,11 @@ class App:
 
         # Setting up scenes and choosing first
         App.scenes["Menu"] = MainMenuScene(self.screen)
+        App.scenes["MultiSetup"] = MultiSetupScene(self.screen)
+        App.scenes["About"] = AboutScene(self.screen)
         App.scenes["Game"] = GameScene()
         App.current_scene = App.scenes["Menu"]
+        # App.current_scene = App.scenes["MultiSetup"]
 
     def run(self):
         """Main app loop"""
@@ -95,8 +100,22 @@ class App:
                 App.current_scene.change_scene = None
                 App.current_scene = App.scenes["Game"]
                 App.current_scene.setup(**change_scene.kwargs)
+
             elif change_scene.scene_id == "Menu":
                 self.stepping = False
                 App.current_scene.change_scene = None
                 App.current_scene = App.scenes["Menu"]
-                # App.current_scene.setup(**change_scene.kwargs)
+                App.current_scene.setup(**change_scene.kwargs)
+            elif change_scene.scene_id == "MultiSetup":
+
+                self.stepping = False
+                App.current_scene.change_scene = None
+                App.current_scene = App.scenes["MultiSetup"]
+                App.current_scene.setup(**change_scene.kwargs)
+            elif change_scene.scene_id == "About":
+
+                self.stepping = False
+                App.current_scene.change_scene = None
+                App.current_scene = App.scenes["About"]
+                App.current_scene.setup(**change_scene.kwargs)
+

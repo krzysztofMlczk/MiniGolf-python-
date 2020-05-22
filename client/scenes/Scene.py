@@ -22,5 +22,6 @@ class Scene:
     def handle_event(self, event):
         pass
 
-    def setup(self, **kwargs):
-        pass
+    def setup(self, screen=None, **kwargs):
+        if screen:
+            self.gui_mgr.resize_gui(screen)

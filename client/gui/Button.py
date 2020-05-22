@@ -29,7 +29,7 @@ class Button(GUIElement):
         self.clicked = True
         self.position = (self.position[0] + 1, self.position[1] + 1)
 
-    def on_mouse_released(self):
+    def on_mouse_released(self, players=None):
         if self.clicked:
             self.clicked = False
             self.position = (self.position[0] - 1, self.position[1] - 1)
@@ -39,16 +39,22 @@ class Button(GUIElement):
                 scene_init = SceneInit("Game", players=players)
 
             elif self.name == "multi":
-                # TODO
-                # Show screen to choose number of players
-                players = [
-                    Player(0, "orange"),
-                    Player(1, "blue")
-                ]
+                scene_init = SceneInit("MultiSetup", screen=self.get_current_screen())
+
+            elif self.name == "players_up" or self.name == "maps_up":
+                return 1
+
+            elif self.name == "players_down" or self.name == "maps_down":
+                return -1
+
+            elif self.name == "play_btn":
                 scene_init = SceneInit("Game", players=players)
 
+            elif self.name == "cancel_btn":
+                scene_init = SceneInit("Menu", screen=self.get_current_screen())
+
             elif self.name == "about":
-                scene_init = None
+                scene_init = SceneInit("About", screen=self.get_current_screen())
 
             elif self.name == "quit":
                 exit(0)
@@ -84,3 +90,8 @@ class Button(GUIElement):
         self.image = pygame.transform.scale(self.image_original, dimension)
 
         self.old_scr_size = new_size
+
+    def get_current_screen(self):
+        info = pygame.display.Info()
+        return pygame.display.set_mode((info.current_w, info.current_h), pygame.RESIZABLE)
+

@@ -28,14 +28,6 @@ class GameScene(Scene):
     def draw(self, screen):
         """Draw scene and change ball if required"""
 
-        # Draw balls
-        for player in self.players:
-            player.ball.draw(screen)
-
-        # Draw trajectory when aiming
-        if self.trajectory:
-            pygame.draw.lines(screen, (255, 0, 230), False, self.trajectory, 2)
-
         # Switch turn
         if self.balls_not_moving():
             if self.next_turn or self.current_player().ball.state is BallState.IN_CUP:
@@ -43,7 +35,12 @@ class GameScene(Scene):
 
         # Update map and draw it
         self.object_mgr.update_objects()
-        self.object_mgr.draw_objects(screen)
+
+        screen.blit(self.object_mgr.draw_dynamic_objects(), (0, 0))
+
+        # Draw trajectory when aiming
+        if self.trajectory:
+            pygame.draw.lines(screen, (255, 0, 230), False, self.trajectory, 2)
 
     def handle_event(self, event):
         """Handling specific scene events"""
@@ -164,6 +161,8 @@ class GameScene(Scene):
         self.players[0].ball.turn = True
         print("Player 0 to move")
 
+        self.object_mgr.blit_on_display(self.object_mgr.draw_static_object())
+
     def balls_not_moving(self):
         """Check if all balls are still"""
         for player in self.players:
@@ -197,6 +196,8 @@ class GameScene(Scene):
 
         self.players[0].ball.turn = True
         print("Player 0 to move")
+
+        self.object_mgr.blit_on_display(self.object_mgr.draw_static_object())
 
     def search_for_maps(self):
         levels = map_search('./levels')

@@ -27,6 +27,8 @@ class MultiSetupScene(Scene):
         self.add_player()
         self.add_player()
 
+        self.gui_mgr.resize_gui(screen)
+
     def setup_components(self):
         """Setting up and registering (happens automatically) components"""
         width, height = 1920, 1080

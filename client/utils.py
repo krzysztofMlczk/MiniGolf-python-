@@ -1,9 +1,6 @@
-screen_size = None
-
-
 def flip_coords(point):
     """Converting pymunk coordinates to pygame"""
-    return point[0], -point[1] + screen_size[1]
+    return point[0], -point[1] + 900
 
 
 def sign(x):

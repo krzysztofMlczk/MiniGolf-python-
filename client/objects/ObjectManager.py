@@ -1,13 +1,15 @@
 import pymunk
+import pygame
 
 
 # Class responsible for holding the list of all objects on the scene
 # and updating them. Self registration is enabled by default, that means
 # each newly created objects is automatically being registered.
 class ObjectManager:
-    def __init__(self, space):
+    def __init__(self, space, screen):
         self.objects = []
         self.space = space
+        self.display = screen
 
     def register_object(self, obj):
         self.objects.append(obj)
@@ -38,9 +40,40 @@ class ObjectManager:
         for obj in self.objects:
             obj.update()
 
-    def draw_objects(self, display):
+    def draw_objects(self):
+        display = self.display.copy()
+
         for obj in self.objects:
             obj.draw(display)
+
+        return display
+
+    def draw_static_object(self):
+        display = self.display.copy()
+
+        for obj in self.objects:
+            if obj.type == 'static':
+                obj.draw(display)
+
+        return display
+
+    def draw_dynamic_objects(self):
+        display = self.display.copy()
+
+        for obj in self.objects:
+            if obj.type == 'dynamic':
+                obj.draw(display)
+
+        return display
+
+    def blit_on_display(self, display):
+        self.display = display
+
+    def clear_display(self, fill_color=None):
+        if fill_color:
+            self.display = pygame.Surface.fill(color=fill_color)
+        else:
+            self.display = pygame.Surface.fill(color=pygame.Color(0, 0, 0, 0))
 
     def move_to_front(self, obj):
         try:

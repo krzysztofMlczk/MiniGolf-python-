@@ -13,6 +13,8 @@ class AboutScene(Scene):
         self.change_scene = None
         self.setup_components()
 
+        self.gui_mgr.resize_gui(screen)
+
     def setup_components(self):
         """Setting up and registering(happens automatically) components"""
         width, height = 1920, 1080

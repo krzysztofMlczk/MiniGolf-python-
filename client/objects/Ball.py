@@ -18,7 +18,7 @@ class Ball(Object):
         image = ResourcesManager.get_image('obj_ball_' + color)
         self.radius = dimension[0] / 2
 
-        super().__init__(position, dimension, image, obj_mgr=obj_mgr)
+        super().__init__(position, dimension, image, obj_mgr=obj_mgr, obj_type='dynamic')
 
         self.turn = False
         self.state = BallState.NOT_MOVING

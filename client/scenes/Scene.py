@@ -27,4 +27,6 @@ class Scene:
         for key, value in kwargs.items():
             if key == "screen":
                 screen = value
-        self.gui_mgr.resize_gui(screen)
+
+        if screen:
+            self.gui_mgr.resize_gui(screen)

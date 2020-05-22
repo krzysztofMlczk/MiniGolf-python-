@@ -100,17 +100,20 @@ class App:
                 App.current_scene.change_scene = None
                 App.current_scene = App.scenes["Game"]
                 App.current_scene.setup(**change_scene.kwargs)
+
             elif change_scene.scene_id == "Menu":
                 self.stepping = False
                 App.current_scene.change_scene = None
                 App.current_scene = App.scenes["Menu"]
                 App.current_scene.setup(**change_scene.kwargs)
             elif change_scene.scene_id == "MultiSetup":
+
                 self.stepping = False
                 App.current_scene.change_scene = None
                 App.current_scene = App.scenes["MultiSetup"]
                 App.current_scene.setup(**change_scene.kwargs)
             elif change_scene.scene_id == "About":
+
                 self.stepping = False
                 App.current_scene.change_scene = None
                 App.current_scene = App.scenes["About"]

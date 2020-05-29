@@ -1,42 +1,42 @@
 {
-  "id": 1,
+  "id": 0,
   "cup": {
     "pos": [700, 340],
-    "dim": [48, 48]
+    "dim": [32, 32]
   },
   "obstacles": [
     {
       "name": "brick",
-      "pos": [200, 100],
+      "pos": [64, 64],
       "dim": [64, 64],
-      "horizontal": 16
+      "vertical": 16
     },
     {
       "name": "brick",
-      "pos": [200, 700],
+      "pos": [64, 64],
       "dim": [64, 64],
-      "horizontal": 16
+      "horizontal": 30
     },
     {
       "name": "brick",
-      "pos": [200, 164],
+      "pos": [64, 1024],
       "dim": [64, 64],
-      "vertical": 9
+      "horizontal": 30
     },
     {
       "name": "brick",
-      "pos": [1160, 164],
+      "pos": [1920, 64],
       "dim": [64, 64],
-      "vertical": 9
+      "vertical": 16
     }
   ],
   "surfaces": [
     {
-      "name": "ice",
-      "pos": [264, 164],
+      "name": "grass",
+      "pos": [128, 128],
       "dim": [64, 64],
-      "vertical": 7,
-      "horizontal": 13
+      "vertical": 14,
+      "horizontal": 28
     }
   ]
 }

@@ -142,7 +142,7 @@ class GameScene(Scene):
         # self.map = Map(self.players, self.object_mgr)
         next_map_details = self.loader.next_map()
         if next_map_details:
-            self.map = Map(*self.loader.next_map())
+            self.map = Map(*next_map_details)
         else:
             self.change_scene = SceneInit("Menu")
             return
@@ -186,7 +186,7 @@ class GameScene(Scene):
         self.map = Map(*self.loader.next_map())
 
         for player in self.players:
-            player.ball = Ball((300, 540), (32, 32), color=player.color, obj_mgr=self.object_mgr)
+            player.ball = Ball((200, 200), (16, 16), color=player.color, obj_mgr=self.object_mgr)
 
         # We need a custom collision handler for ball here:
         self.object_mgr.space.add_collision_handler(1, 2).pre_solve = self.ball_in_cup
@@ -200,6 +200,6 @@ class GameScene(Scene):
         self.object_mgr.blit_on_display(self.object_mgr.draw_static_object())
 
     def search_for_maps(self):
-        levels = map_search('./levels')
+        levels = map_search('./client/levels')
         for lvl in levels:
             self.loader.add_map_file(lvl)

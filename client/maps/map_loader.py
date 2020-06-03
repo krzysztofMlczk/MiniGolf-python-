@@ -36,12 +36,11 @@ class Loader(object):
         return Loader.map_info(raw)
 
     def map_from_info(self, level):
+        for surface in level["surfaces"]:
+            Surface.from_template(obj_mgr=self.obj_mgr, **surface)
 
         for obstacle in level["obstacles"]:
             Obstacle.from_template(obj_mgr=self.obj_mgr, **obstacle)
-
-        for surface in level["surfaces"]:
-            Surface.from_template(obj_mgr=self.obj_mgr, **surface)
 
         cup = ObjectCup(self.obj_mgr, **level['cup'], )
 

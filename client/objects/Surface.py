@@ -5,7 +5,7 @@ from client.objects.Object import Object
 from client.resources.ResourcesManager import ResourcesManager
 from client.objects import SurfaceVelocities
 
-template_dir = "./objects/templates/"
+template_dir = "./client/objects/templates/"
 
 
 class Surface(Object):

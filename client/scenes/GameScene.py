@@ -10,6 +10,7 @@ from client.enums.ball_state_enum import BallState
 from client.objects.Ball import Ball
 from client.maps.map_loader import Loader
 from client.maps.map_search import map_search
+from client.gui.ScoreBoard import ScoreBoard
 
 
 class GameScene(Scene):
@@ -17,6 +18,7 @@ class GameScene(Scene):
 
     def __init__(self):
         super().__init__(pymunk.Space())
+        self.scoreboards = dict()
         self.loader = Loader(self.object_mgr)
         self.next = None
         self.map = None
@@ -142,7 +144,7 @@ class GameScene(Scene):
         # self.map = Map(self.players, self.object_mgr)
         next_map_details = self.loader.next_map()
         if next_map_details:
-            self.map = Map(*next_map_details)
+            self.map = Map(*next_map_details[0:2])
         else:
             self.change_scene = SceneInit("Menu")
             return
@@ -150,7 +152,7 @@ class GameScene(Scene):
         # Resetting balls and adding them back to simulation space
         for player in self.players:
             player.ball.state = BallState.NOT_MOVING
-            player.ball.shape.body.position = Vec2d(300, 540 + 10)
+            player.ball.shape.body.position = Vec2d(next_map_details[2])
             player.ball.shape.body.velocity = Vec2d(0.0, 0.0)
             self.object_mgr.register_object(player.ball)
             print("Player {} points: {}".format(player.id, player.points))
@@ -183,10 +185,12 @@ class GameScene(Scene):
     def setup(self, players=None, **kwargs):
         self.players = players
         self.search_for_maps()
-        self.map = Map(*self.loader.next_map())
+        map_details = self.loader.next_map()
+        self.map = Map(*map_details[0:2])
 
         for player in self.players:
-            player.ball = Ball((200, 200), (16, 16), color=player.color, obj_mgr=self.object_mgr)
+            player.ball = Ball((map_details[2]), (32, 32), color=player.color, obj_mgr=self.object_mgr)
+            # self.scoreboards[player.color] = ScoreBoard()
 
         # We need a custom collision handler for ball here:
         self.object_mgr.space.add_collision_handler(1, 2).pre_solve = self.ball_in_cup
@@ -200,6 +204,6 @@ class GameScene(Scene):
         self.object_mgr.blit_on_display(self.object_mgr.draw_static_object())
 
     def search_for_maps(self):
-        levels = map_search('./levels')
+        levels = map_search('./client/levels')
         for lvl in levels:
             self.loader.add_map_file(lvl)

@@ -12,7 +12,7 @@ from client.utils import flip_coords
     2 - cups
     3 - obstacles
 '''
-template_dir = "./objects/templates/"
+template_dir = "./client/objects/templates/"
 
 
 class Obstacle(Object):

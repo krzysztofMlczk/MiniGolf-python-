@@ -1,4 +1,5 @@
 import os
+import copy
 
 import pygame
 import pymunk
@@ -7,11 +8,54 @@ from client.scenes.Scene import Scene
 from client.resources.ResourcesManager import ResourcesManager
 
 
-class EditorScene(Scene):
-    """Scene for drawing and handling game events"""
+class Object:
+    def __init__(self, image, name, rot):
+        self.image = image
+        self.name = name
+        self.rotation = rot
 
+
+class ToolIcon:
+    def __init__(self, obj, rect):
+        self.object = obj
+        self.rect = rect
+
+
+class MapTile:
+    def __init__(self, rect, obj):
+        self.rect = rect
+
+        self.objects = []
+        if obj is not None:
+            self.add_object(obj)
+
+    def add_object(self, obj):
+        for o in self.objects:
+            if o.name == obj.name:
+                return
+        self.objects.append(obj)
+
+    def remove_object(self, obj):
+        for o in self.objects:
+            if o.name == obj.name:
+                self.objects.remove(o)
+
+    def clear_objects(self):
+        self.objects.clear()
+
+    def has_object(self):
+        return len(self.objects) > 0
+
+    def rotate_object(self, obj, rot):
+        for o in self.objects:
+            if o.name == obj.name:
+                o.rotation = (o.rotation + rot) % 360
+
+
+class EditorScene(Scene):
     def __init__(self, screen_dim):
         super().__init__(pymunk.Space())
+        # Distance of mouse pointer from screen border that forces camera movement:
         self.dist_camera_mv = 200
 
         self.grid_size = None
@@ -20,8 +64,8 @@ class EditorScene(Scene):
         self.screen_dim = screen_dim
         self.generate_grid()
 
-        self.objects = self.load_objects()
-        self.curr_obj = (None, None, 'None')
+        self.toolbox = self.load_objects()
+        self.curr_obj = ToolIcon(None, None)
 
         pygame.font.init()
         self.font = pygame.font.SysFont('Comic Sans MS', 30)
@@ -39,26 +83,30 @@ class EditorScene(Scene):
         mouse_pos = pygame.mouse.get_pos()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
+
+            # Placing new object:
             if event.button == pygame.BUTTON_LEFT:
                 clicked_toolbox = self.get_toolbox_tile(mouse_pos)
                 clicked_tile_index = self.get_grid_tile(mouse_pos)
 
                 if clicked_toolbox is not None:
                     self.curr_obj = clicked_toolbox
-                elif clicked_tile_index is not None and self.grid[clicked_tile_index][1] is None:
-                    self.grid[clicked_tile_index] = (self.grid[clicked_tile_index][0], self.curr_obj, 0)
+                elif clicked_tile_index is not None and self.curr_obj.object is not None:
+                    obj = copy.copy(self.curr_obj.object)
+                    obj.rotation = 0
+                    self.grid[clicked_tile_index].add_object(obj)
 
+            # Deleting object:
             elif event.button == pygame.BUTTON_RIGHT:
                 clicked_tile_index = self.get_grid_tile(mouse_pos)
                 if clicked_tile_index is not None:
-                    self.grid[clicked_tile_index] = (self.grid[clicked_tile_index][0], None, 0)
+                    self.grid[clicked_tile_index].clear_objects()
 
+            # Rotating object:
             elif event.button == pygame.BUTTON_MIDDLE:
                 clicked_tile_index = self.get_grid_tile(mouse_pos)
-                if clicked_tile_index is not None and self.grid[clicked_tile_index][1] is not None:
-                    self.grid[clicked_tile_index] = (self.grid[clicked_tile_index][0],
-                                                     self.grid[clicked_tile_index][1],
-                                                     (self.grid[clicked_tile_index][2] + 90) % 360)
+                if clicked_tile_index is not None and self.grid[clicked_tile_index].has_object():
+                    self.grid[clicked_tile_index].rotate_object(self.curr_obj.object, 90)
 
         elif event.type == pygame.MOUSEBUTTONUP:
             pass
@@ -70,23 +118,29 @@ class EditorScene(Scene):
         for x in range(0, width * block_size, block_size):
             for y in range(0, height * block_size, block_size):
                 rect = pygame.Rect(x, y, block_size, block_size)
-                self.grid.append((rect, None, 0))
+                self.grid.append(MapTile(rect, None))
 
         self.grid_size = (dim[0] * block_size, dim[1] * block_size)
 
     def apply_offset(self, offset):
         for i in range(len(self.grid)):
-            tile = self.grid[i]
-            self.grid[i] = (pygame.Rect(tile[0][0] + offset[0], tile[0][1] + offset[1],
-                                        tile[0][2], tile[0][3]), tile[1], tile[2])
-        self.grid_pos = (self.grid[0][0][0], self.grid[0][0][1])
+            rect = self.grid[i].rect
+            self.grid[i].rect = pygame.Rect(rect[0] + offset[0], rect[1] + offset[1],
+                                            rect[2], rect[3])
+
+        self.grid_pos = (self.grid[0].rect[0], self.grid[0].rect[1])
 
     def draw_grid(self, screen):
         for tile in self.grid:
-            if tile[1] is None or tile[1][0] is None:
-                pygame.draw.rect(screen, (255, 255, 255), tile[0], 1)
+            if not tile.has_object():
+                pygame.draw.rect(screen, (255, 255, 255), tile.rect, 1)
             else:
-                screen.blit(pygame.transform.rotate(tile[1][0], tile[2]), (tile[0][0], tile[0][1]))
+                img = pygame.Surface(tile.objects[0].image.get_size())
+                for obj in tile.objects:
+                    img.blit(pygame.transform.rotate(obj.image, obj.rotation), (0, 0))
+
+                screen.blit(img,
+                            (tile.rect[0], tile.rect[1]))
 
     def move_camera(self, mouse_pos):
         cam_mv = (0, 0)
@@ -121,27 +175,35 @@ class EditorScene(Scene):
             for filename in filenames:
                 if filename.endswith('.yaml'):
                     name = os.path.splitext(filename)[0]
-                    objects[name] = (pygame.transform.scale(ResourcesManager.get_image(name), (32, 32)),
-                                     pygame.Rect(200 + off * 32, 5, 32, 32), name)
+                    obj = Object(pygame.transform.scale(ResourcesManager.get_image(name), (32, 32)), name, 0)
+                    icon = ToolIcon(obj, pygame.Rect(200 + off * 32, 5, 32, 32))
+
+                    objects[name] = icon
                     off += 1
         return objects
 
     def display_gui(self, screen):
+        # Draw toolbox:
         screen.blit(self.font.render('Current object:', False, (255, 255, 255)), (5, 5))
 
-        for val in self.objects.values():
-            screen.blit(val[0], (val[1][0], val[1][1]))
+        for tool in self.toolbox.values():
+            screen.blit(tool.object.image, (tool.rect[0], tool.rect[1]))
 
-        screen.blit(self.font.render(self.curr_obj[2], False, (255, 200, 200)), (5, 30))
+        if self.curr_obj.object is not None:
+            name = self.curr_obj.object.name
+        else:
+            name = 'None'
+
+        screen.blit(self.font.render(name, False, (255, 200, 200)), (5, 30))
 
     def get_grid_tile(self, pos):
         for tile in self.grid:
-            if tile[0].collidepoint(pos):
+            if tile.rect.collidepoint(pos):
                 return self.grid.index(tile)
         return None
 
     def get_toolbox_tile(self, pos):
-        for tile in self.objects.values():
-            if tile[1].collidepoint(pos):
-                return tile
+        for tool in self.toolbox.values():
+            if tool.rect.collidepoint(pos):
+                return tool
         return None

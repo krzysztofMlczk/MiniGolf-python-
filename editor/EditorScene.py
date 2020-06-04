@@ -6,6 +6,7 @@ import pymunk
 
 from client.scenes.Scene import Scene
 from client.resources.ResourcesManager import ResourcesManager
+from editor import FileUtils
 
 
 class Object:
@@ -13,6 +14,16 @@ class Object:
         self.image = image
         self.name = name
         self.rotation = rot
+
+
+class Button:
+    def __init__(self, image, pos):
+        self.image = image
+        self.pos = pos
+        self.rect = pygame.Rect(pos[0], pos[1], image.get_width(), image.get_height())
+
+    def clicked(self, pos):
+        return self.rect.collidepoint(*pos)
 
 
 class ToolIcon:
@@ -67,6 +78,9 @@ class EditorScene(Scene):
         self.toolbox = self.load_objects()
         self.curr_obj = ToolIcon(None, None)
 
+        self.button_save = Button(ResourcesManager.get_image('save_icon'), (self.screen_dim[0] - 142, 10))
+        self.button_load = Button(ResourcesManager.get_image('load_icon'), (self.screen_dim[0] - 100, 10))
+
         pygame.font.init()
         self.font = pygame.font.SysFont('Comic Sans MS', 30)
 
@@ -83,9 +97,14 @@ class EditorScene(Scene):
         mouse_pos = pygame.mouse.get_pos()
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-
-            # Placing new object:
             if event.button == pygame.BUTTON_LEFT:
+                # Button click:
+                if self.button_save.clicked(mouse_pos):
+                    FileUtils.save()
+                elif self.button_load.clicked(mouse_pos):
+                    FileUtils.load()
+
+                # Placing new object:
                 clicked_toolbox = self.get_toolbox_tile(mouse_pos)
                 clicked_tile_index = self.get_grid_tile(mouse_pos)
 
@@ -180,6 +199,16 @@ class EditorScene(Scene):
 
                     objects[name] = icon
                     off += 1
+
+        objects['cup'] = ToolIcon(Object(pygame.transform.scale(ResourcesManager.get_image('obj_hole'),
+                                                                (32, 32)), 'cup', 0),
+                                  pygame.Rect(200 + off * 32, 5, 32, 32))
+        off += 1
+        objects['ball'] = ToolIcon(Object(pygame.transform.scale(ResourcesManager.get_image('obj_ball_white'),
+                                                                 (32, 32)), 'ball', 0),
+                                   pygame.Rect(200 + off * 32, 5, 32, 32))
+        off += 1
+
         return objects
 
     def display_gui(self, screen):
@@ -195,6 +224,10 @@ class EditorScene(Scene):
             name = 'None'
 
         screen.blit(self.font.render(name, False, (255, 200, 200)), (5, 30))
+
+        # Draw save/load buttons:
+        screen.blit(self.button_save.image, self.button_save.pos)
+        screen.blit(self.button_load.image, self.button_load.pos)
 
     def get_grid_tile(self, pos):
         for tile in self.grid:

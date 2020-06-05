@@ -1,3 +1,4 @@
 name: "ice"
 friction: 2.0
 function: "default"
+type: "surfaces"

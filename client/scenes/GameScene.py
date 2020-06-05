@@ -200,6 +200,6 @@ class GameScene(Scene):
         self.object_mgr.blit_on_display(self.object_mgr.draw_static_object())
 
     def search_for_maps(self):
-        levels = map_search('./levels')
+        levels = map_search('./client/levels')
         for lvl in levels:
             self.loader.add_map_file(lvl)

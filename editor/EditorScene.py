@@ -152,7 +152,7 @@ class EditorScene(Scene):
                     yaml_file.close()
 
                     obj = Object(pygame.transform.scale(ResourcesManager.get_image(name), (32, 32)), name, 0, t)
-                    icon = ToolIcon(obj, pygame.Rect(200 + off * 32, 5, 32, 32))
+                    icon = ToolIcon(obj, pygame.Rect(off * 32, 5, 32, 32))
 
                     objects[name] = icon
                     off += 1
@@ -160,32 +160,39 @@ class EditorScene(Scene):
         objects['cup'] = ToolIcon(
             Object(pygame.transform.scale(
                 ResourcesManager.get_image('obj_hole'), (32, 32)
-            ), 'obj_hole', 0, 'cup'), pygame.Rect(200 + off * 32, 5, 32, 32)
+            ), 'obj_hole', 0, 'cup'), pygame.Rect(off * 32, 5, 32, 32)
         )
         off += 1
 
         objects['ball'] = ToolIcon(
             Object(pygame.transform.scale(
                 ResourcesManager.get_image('obj_ball_white'), (32, 32)
-            ), 'obj_ball_white', 0, 'ball'), pygame.Rect(200 + off * 32, 5, 32, 32)
+            ), 'obj_ball_white', 0, 'ball'), pygame.Rect(off * 32, 5, 32, 32)
         )
         off += 1
 
         return objects
 
     def display_gui(self, screen):
-        # Draw toolbox:
-        screen.blit(self.font.render('Current object:', False, (255, 255, 255)), (5, 5))
-
-        for tool in self.toolbox.values():
-            screen.blit(tool.object.image, (tool.rect[0], tool.rect[1]))
+        origin = (5, 5)
 
         if self.curr_obj.object is not None:
             name = self.curr_obj.object.name
         else:
             name = 'None'
 
-        screen.blit(self.font.render(name, False, (255, 200, 200)), (5, 30))
+        # Draw object description:
+        text_current = self.font.render('Current object:', False, (255, 255, 255))
+        screen.blit(text_current, (origin[0], origin[1]))
+        origin = (origin[0], origin[1] + text_current.get_height())
+
+        text_obj = self.font.render(name, False, (255, 200, 200))
+        screen.blit(text_obj, origin)
+        origin = (origin[0] + text_current.get_width() + 50, origin[1])
+
+        # Draw toolbox:
+        for tool in self.toolbox.values():
+            screen.blit(tool.object.image, (origin[0] + tool.rect[0], tool.rect[1]))
 
         # Draw save/load buttons:
         screen.blit(self.button_export.image, self.button_export.pos)

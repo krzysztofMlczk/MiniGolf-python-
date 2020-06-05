@@ -2,12 +2,12 @@ import pygame
 
 
 class Object:
-    def __init__(self, image, name, rot, t):
+    def __init__(self, image, name, rot, t, horiz=1, vert=1):
         self.image = image
         self.name = name
         self.rotation = rot
-        self.horizontal = 1
-        self.vertical = 1
+        self.horizontal = horiz
+        self.vertical = vert
         self.type = t
 
     def overlap_image(self):

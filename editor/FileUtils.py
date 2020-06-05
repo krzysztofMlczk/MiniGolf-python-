@@ -122,6 +122,7 @@ def load(map):
 
             for obj in obj_list:
                 tile.add_object(Object(pygame.transform.scale(ResourcesManager.get_image(obj['name']),
-                                                              obj['dim']), obj['name'], obj['rotation'], obj['type']))
+                                                              obj['dim']), obj['name'], obj['rotation'], obj['type'],
+                                       horiz=obj['horizontal'], vert=obj['vertical']))
 
             map[i] = tile

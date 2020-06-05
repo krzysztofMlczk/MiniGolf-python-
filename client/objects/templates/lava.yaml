@@ -1,0 +1,4 @@
+name: "lava"
+friction: 10.0
+function: "default"
+type: "surfaces"

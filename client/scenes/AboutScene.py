@@ -13,6 +13,8 @@ class AboutScene(Scene):
         self.change_scene = None
         self.setup_components()
 
+        self.gui_mgr.resize_gui(screen)
+
     def setup_components(self):
         """Setting up and registering(happens automatically) components"""
         width, height = 1920, 1080
@@ -64,7 +66,7 @@ class AboutScene(Scene):
         about = Label(
             name="about",
             dimension=(500, 500),
-            position=(710, 450),
+            position=(750, 450),
             image=ResourcesManager.get_image("about_label"),
             obj_mgr=self.gui_mgr,
             default_res=(width, height)
@@ -74,7 +76,7 @@ class AboutScene(Scene):
         cancel_btn = Button(
             name="cancel_btn",
             dimension=(134, 50),
-            position=(893, 870),
+            position=(933, 970),
             image=ResourcesManager.get_image("btn_cancel"),
             image_hover=ResourcesManager.get_image("btn_cancel_hover"),
             obj_mgr=self.gui_mgr,

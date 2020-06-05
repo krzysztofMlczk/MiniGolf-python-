@@ -27,6 +27,8 @@ class MultiSetupScene(Scene):
         self.add_player()
         self.add_player()
 
+        self.gui_mgr.resize_gui(screen)
+
     def setup_components(self):
         """Setting up and registering (happens automatically) components"""
         width, height = 1920, 1080
@@ -195,7 +197,7 @@ class MultiSetupScene(Scene):
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         elem.on_mouse_clicked()
                     elif event.type == pygame.MOUSEBUTTONUP:
-                        outcome = elem.on_mouse_released(self.players)
+                        outcome = elem.on_mouse_released(self.players, self.maps_to_play)
                         if isinstance(outcome, SceneInit):
                             self.change_scene = outcome
                         elif isinstance(outcome, int):

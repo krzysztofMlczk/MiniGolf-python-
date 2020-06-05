@@ -1,12 +1,10 @@
 import math
-from time import time
 
 import pymunk
 from pymunk import Vec2d
 
 from client.objects.Object import Object
 from client.objects.Surface import Surface
-from client.objects.SurfaceLava import SurfaceLava
 from client.objects.particles.ParticlesFire import ParticlesFire
 from client.resources.ResourcesManager import ResourcesManager
 from client.enums.ball_state_enum import BallState
@@ -18,7 +16,7 @@ class Ball(Object):
         image = ResourcesManager.get_image('obj_ball_' + color)
         self.radius = dimension[0] / 2
 
-        super().__init__(position, dimension, image, obj_mgr=obj_mgr)
+        super().__init__(position, dimension, image, obj_mgr=obj_mgr, name='ball', obj_type='dynamic')
 
         self.turn = False
         self.state = BallState.NOT_MOVING
@@ -26,7 +24,7 @@ class Ball(Object):
 
         self.particles_effect = None
 
-    def friction_velocity(self, body, gravity, damping, dt, default_friction=2):
+    def friction_velocity(self, body, gravity, damping, dt, default_friction=6):
         """Custom velocity function for pymunk body"""
         if self.state is BallState.IN_CUP:
             body.velocity = Vec2d(0.0, 0.0)
@@ -36,12 +34,12 @@ class Ball(Object):
 
             surf = self.get_surface()
 
-            if isinstance(surf, SurfaceLava) and self.particles_effect is None:
+            if surf is not None and surf.name == 'lava' and self.particles_effect is None:
                 self.particles_effect = ParticlesFire(None, (32, 32), follow=self, obj_mgr=self.object_mgr)
 
             if surf is not None:
                 # Let the surface change the velocity:
-                velocity = surf.change_velocity(body.velocity)
+                velocity = surf.velocity_func(body.velocity, surf.friction)
             else:
                 # Calculating friction vector
                 friction_vec = -default_friction * body.velocity / math.hypot(body.velocity.x, body.velocity.y)
@@ -57,7 +55,7 @@ class Ball(Object):
                 velocity.y = 0.0
 
             # Establish maximum velocity
-            max_velocity = 800.0
+            max_velocity = 1800.0
 
             if math.fabs(velocity.x) > max_velocity:
                 velocity.x = max_velocity * sign(velocity.x)
@@ -69,7 +67,7 @@ class Ball(Object):
 
             if body.velocity == Vec2d(0.0, 0.0):
                 if self.state is not BallState.CLICKED:
-                    if isinstance(self.get_surface(), SurfaceLava):
+                    if self.get_surface() is not None and self.get_surface().name == 'lava':
                         self.shape.body.position = self.last_pos
 
                     self.state = BallState.NOT_MOVING

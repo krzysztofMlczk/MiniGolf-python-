@@ -28,14 +28,6 @@ class GameScene(Scene):
     def draw(self, screen):
         """Draw scene and change ball if required"""
 
-        # Draw balls
-        for player in self.players:
-            player.ball.draw(screen)
-
-        # Draw trajectory when aiming
-        if self.trajectory:
-            pygame.draw.lines(screen, (255, 0, 230), False, self.trajectory, 2)
-
         # Switch turn
         if self.balls_not_moving():
             if self.next_turn or self.current_player().ball.state is BallState.IN_CUP:
@@ -43,7 +35,12 @@ class GameScene(Scene):
 
         # Update map and draw it
         self.object_mgr.update_objects()
-        self.object_mgr.draw_objects(screen)
+
+        screen.blit(self.object_mgr.draw_dynamic_objects(), (0, 0))
+
+        # Draw trajectory when aiming
+        if self.trajectory:
+            pygame.draw.lines(screen, (255, 0, 230), False, self.trajectory, 2)
 
     def handle_event(self, event):
         """Handling specific scene events"""
@@ -74,7 +71,7 @@ class GameScene(Scene):
 
                 if event.button == pygame.BUTTON_LEFT:
 
-                    direction = 5*Vec2d(
+                    direction = 10*Vec2d(
                         player.ball.shape.body.position.x - flip_coords(event.pos)[0],
                         player.ball.shape.body.position.y - flip_coords(event.pos)[1]
                     )
@@ -145,7 +142,7 @@ class GameScene(Scene):
         # self.map = Map(self.players, self.object_mgr)
         next_map_details = self.loader.next_map()
         if next_map_details:
-            self.map = Map(*self.loader.next_map())
+            self.map = Map(*next_map_details)
         else:
             self.change_scene = SceneInit("Menu")
             return
@@ -164,6 +161,8 @@ class GameScene(Scene):
         self.players[0].ball.turn = True
         print("Player 0 to move")
 
+        self.object_mgr.blit_on_display(self.object_mgr.draw_static_object())
+
     def balls_not_moving(self):
         """Check if all balls are still"""
         for player in self.players:
@@ -181,13 +180,13 @@ class GameScene(Scene):
         # We ignore the collision:
         return False
 
-    def setup(self, players=None, **kwargs):
+    def setup(self, players=None, maps_to_play=None, **kwargs):
         self.players = players
         self.search_for_maps()
         self.map = Map(*self.loader.next_map())
 
         for player in self.players:
-            player.ball = Ball((300, 540), (32, 32), color=player.color, obj_mgr=self.object_mgr)
+            player.ball = Ball((200, 200), (16, 16), color=player.color, obj_mgr=self.object_mgr)
 
         # We need a custom collision handler for ball here:
         self.object_mgr.space.add_collision_handler(1, 2).pre_solve = self.ball_in_cup
@@ -198,7 +197,9 @@ class GameScene(Scene):
         self.players[0].ball.turn = True
         print("Player 0 to move")
 
+        self.object_mgr.blit_on_display(self.object_mgr.draw_static_object())
+
     def search_for_maps(self):
-        levels = map_search('./levels')
+        levels = map_search('./client/levels')
         for lvl in levels:
             self.loader.add_map_file(lvl)

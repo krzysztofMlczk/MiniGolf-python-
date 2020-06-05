@@ -11,7 +11,7 @@ class ResourcesManager:
     @classmethod
     def load_from_disk(cls):
 
-        for root, dirnames, filenames in os.walk('./resources'):
+        for root, dirnames, filenames in os.walk('./client/resources'):
             for filename in filenames:
                 if filename.endswith(('.jpg', '.png', '.bmp', '.mp3')):
                     cls.images[os.path.splitext(filename)[0]] =\

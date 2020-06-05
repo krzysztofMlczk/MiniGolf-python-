@@ -1,3 +1,5 @@
+import pygame
+
 from client.objects.ObjectManager import ObjectManager
 from client.gui.GUIManager import GUIManager
 
@@ -10,7 +12,8 @@ from client.gui.GUIManager import GUIManager
 class Scene:
     def __init__(self, space, fill_color=(0, 0, 0)):
         self.fill_color = fill_color
-        self.object_mgr = ObjectManager(space)
+        self.display = pygame.Surface((1920, 1080), flags=pygame.SRCALPHA)
+        self.object_mgr = ObjectManager(space, self.display)
         self.gui_mgr = GUIManager()
 
     def get_space(self):

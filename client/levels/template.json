@@ -4,40 +4,39 @@
     "pos": [700, 340],
     "dim": [32, 32]
   },
-  "bws": [
+  "obstacles": [
     {
-      "pos": [50, 50],
-      "dim": [30, 30]
+      "name": "brick",
+      "pos": [64, 64],
+      "dim": [64, 64],
+      "vertical": 14
+    },
+    {
+      "name": "brick",
+      "pos": [64, 64],
+      "dim": [64, 64],
+      "horizontal": 26
+    },
+    {
+      "name": "brick",
+      "pos": [64, 960],
+      "dim": [64, 64],
+      "horizontal": 26
+    },
+    {
+      "name": "brick",
+      "pos": [1728, 64],
+      "dim": [64, 64],
+      "vertical": 15
     }
   ],
-  "rock": [
+  "surfaces": [
     {
-      "pos": [500, 500],
-      "dim": [30, 30]
-    }
-  ],
-  "dirt": [
-    {
-      "pos": [90, 50],
-      "dim": [30, 30]
-    }
-  ],
-  "grass": [
-    {
-      "pos": [130, 50],
-      "dim": [30, 30]
-    }
-  ],
-  "ice": [
-    {
-      "pos": [170, 50],
-      "dim": [30, 30]
-    }
-  ],
-  "lava": [
-    {
-      "pos": [210, 50],
-      "dim": [30, 30]
+      "name": "grass",
+      "pos": [128, 128],
+      "dim": [64, 64],
+      "vertical": 14,
+      "horizontal": 28
     }
   ]
 }

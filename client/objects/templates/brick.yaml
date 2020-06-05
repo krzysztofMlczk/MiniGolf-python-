@@ -1,0 +1,3 @@
+name: "brick"
+elasticity: 0.8
+type: "obstacles"

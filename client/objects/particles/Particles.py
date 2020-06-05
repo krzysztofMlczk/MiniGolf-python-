@@ -14,6 +14,7 @@ class Particles:
 
         # For ObjectManager purposes:
         self.shape = None
+        self.type = 'dynamic'
 
         self._anim_time = time()
         self.frame_interval = frame_interval

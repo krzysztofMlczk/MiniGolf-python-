@@ -157,13 +157,18 @@ class EditorScene(Scene):
                     objects[name] = icon
                     off += 1
 
-        objects['cup'] = ToolIcon(Object(pygame.transform.scale(ResourcesManager.get_image('obj_hole'),
-                                                                (32, 32)), 'obj_hole', 0, 'cup'),
-                                  pygame.Rect(200 + off * 32, 5, 32, 32))
+        objects['cup'] = ToolIcon(
+            Object(pygame.transform.scale(
+                ResourcesManager.get_image('obj_hole'), (32, 32)
+            ), 'obj_hole', 0, 'cup'), pygame.Rect(200 + off * 32, 5, 32, 32)
+        )
         off += 1
-        objects['ball'] = ToolIcon(Object(pygame.transform.scale(ResourcesManager.get_image('obj_ball_white'),
-                                                                 (32, 32)), 'obj_ball_white', 0, 'ball'),
-                                   pygame.Rect(200 + off * 32, 5, 32, 32))
+
+        objects['ball'] = ToolIcon(
+            Object(pygame.transform.scale(
+                ResourcesManager.get_image('obj_ball_white'), (32, 32)
+            ), 'obj_ball_white', 0, 'ball'), pygame.Rect(200 + off * 32, 5, 32, 32)
+        )
         off += 1
 
         return objects

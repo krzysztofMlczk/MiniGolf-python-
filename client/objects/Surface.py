@@ -5,7 +5,7 @@ from client.objects.Object import Object
 from client.resources.ResourcesManager import ResourcesManager
 from client.objects import SurfaceVelocities
 
-template_dir = "./objects/templates/"
+template_dir = "./client/objects/templates/"
 
 
 class Surface(Object):
@@ -23,7 +23,7 @@ class Surface(Object):
         display.blit(self.image, self.position)
 
     @classmethod
-    def from_template(cls, name, pos, dim, obj_mgr):
+    def from_template(cls, name, pos, dim, obj_mgr, **kwargs):
         with open(template_dir + name + ".yaml") as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
 

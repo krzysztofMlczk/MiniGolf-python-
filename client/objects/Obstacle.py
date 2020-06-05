@@ -12,7 +12,7 @@ from client.utils import flip_coords
     2 - cups
     3 - obstacles
 '''
-template_dir = "./objects/templates/"
+template_dir = "./client/objects/templates/"
 
 
 class Obstacle(Object):
@@ -37,7 +37,7 @@ class Obstacle(Object):
         display.blit(self.image, flip_coords(pos))
 
     @classmethod
-    def from_template(cls, name, pos, dim, obj_mgr):
+    def from_template(cls, name, pos, dim, obj_mgr, **kwargs):
         with open(template_dir + name + ".yaml") as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
 

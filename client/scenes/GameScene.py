@@ -142,7 +142,7 @@ class GameScene(Scene):
         # self.map = Map(self.players, self.object_mgr)
         next_map_details = self.loader.next_map()
         if next_map_details:
-            self.map = Map(*self.loader.next_map())
+            self.map = Map(*next_map_details)
         else:
             self.change_scene = SceneInit("Menu")
             return
@@ -200,6 +200,6 @@ class GameScene(Scene):
         self.object_mgr.blit_on_display(self.object_mgr.draw_static_object())
 
     def search_for_maps(self):
-        levels = map_search('./levels')
+        levels = map_search('./client/levels')
         for lvl in levels:
             self.loader.add_map_file(lvl)

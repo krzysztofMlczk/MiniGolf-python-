@@ -125,6 +125,7 @@ class GameScene(Scene):
     def remove(self, ball):
         """Removing ball from space"""
         ball.state = BallState.IN_CUP
+        self.object_mgr.destroy_object(ball.particles_effect)
         ball.particles_effect = None
         self.object_mgr.destroy_object(ball)
 

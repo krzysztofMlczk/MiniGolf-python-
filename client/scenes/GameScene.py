@@ -10,7 +10,7 @@ from client.enums.ball_state_enum import BallState
 from client.objects.Ball import Ball
 from client.maps.map_loader import Loader
 from client.maps.map_search import map_search
-from client.gui.ScoreBoard import ScoreBoard
+from client.resources.ResourcesManager import ResourcesManager
 
 
 class GameScene(Scene):
@@ -18,6 +18,7 @@ class GameScene(Scene):
 
     def __init__(self):
         super().__init__(pymunk.Space())
+        self.bacground_color = (0, 0, 0)
         self.scoreboards = dict()
         self.loader = Loader(self.object_mgr)
         self.next = None
@@ -26,6 +27,7 @@ class GameScene(Scene):
         self.trajectory = None
         self.next_turn = None
         self.change_scene = None
+        self.font = pygame.font.SysFont("monospace", 48)
 
     def draw(self, screen):
         """Draw scene and change ball if required"""
@@ -86,6 +88,7 @@ class GameScene(Scene):
                         player.points[str(self.map.id)] += 1
                     else:
                         player.points[str(self.map.id)] = 1
+                    self.show_score()
 
                 else:
                     player.ball.state = BallState.NOT_MOVING
@@ -128,11 +131,11 @@ class GameScene(Scene):
             self.players[next_id].ball.turn = True
             self.next_turn = False
             print("Player {} to move".format(next_id))
-
         # If all players ended, load next map
         else:
             print("Next map")
             self.next_map()
+        self.show_score()
 
     def next_map(self):
         """Switch to next map"""
@@ -163,6 +166,8 @@ class GameScene(Scene):
         self.players[0].ball.turn = True
         print("Player 0 to move")
 
+        self.show_score()
+
         self.object_mgr.blit_on_display(self.object_mgr.draw_static_object())
 
     def balls_not_moving(self):
@@ -184,13 +189,12 @@ class GameScene(Scene):
 
     def setup(self, players=None, maps_to_play=None, **kwargs):
         self.players = players
-        self.search_for_maps()
+        self.search_for_maps(maps_to_play)
         map_details = self.loader.next_map()
         self.map = Map(*map_details[0:2])
 
         for player in self.players:
             player.ball = Ball((map_details[2]), (32, 32), color=player.color, obj_mgr=self.object_mgr)
-            # self.scoreboards[player.color] = ScoreBoard()
 
         # We need a custom collision handler for ball here:
         self.object_mgr.space.add_collision_handler(1, 2).pre_solve = self.ball_in_cup
@@ -200,10 +204,30 @@ class GameScene(Scene):
 
         self.players[0].ball.turn = True
         print("Player 0 to move")
-
+        self.show_score()
         self.object_mgr.blit_on_display(self.object_mgr.draw_static_object())
 
-    def search_for_maps(self):
+    def search_for_maps(self, count):
         levels = map_search('./client/levels')
         for lvl in levels:
-            self.loader.add_map_file(lvl)
+            if 0 < count:
+                self.loader.add_map_file(lvl)
+                count -= 0
+
+    def show_score(self):
+        text = 'level: ' + str(self.map.id) + '     score:  '
+        label = self.font.render(text, 1, (255, 255, 255), (0, 0, 0))
+        self.object_mgr.display.blit(label, (96, 4))
+        offset = 664
+        for player in self.players:
+            if player.ball.turn:
+                pygame.draw.rect(self.object_mgr.display, (240, 50, 50), (offset-2, 2, 60, 60), 2)
+            else:
+                pygame.draw.rect(self.object_mgr.display, self.bacground_color, (offset-2, 2, 60, 60), 2)
+            ball_img = ResourcesManager.get_image('obj_ball_' + player.color)
+            ball_img = pygame.transform.scale(ball_img, (56, 56))
+            self.object_mgr.display.blit(ball_img, (offset, 4))
+            label = self.font.render(str(sum(v for k, v in player.points.items())), 1, (0, 0, 0))
+            label = pygame.transform.scale(label, (48, 56))
+            self.object_mgr.display.blit(label, (offset+4, 4))
+            offset += 70

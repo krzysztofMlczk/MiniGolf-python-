@@ -52,13 +52,15 @@ def export(map):
                     data['ball']['rotation'] = obj.rotation
                 else:
                     pos = (tile.rect[0], tile.rect[1])
-                    dim = obj.image.get_size()
+                    dim = (obj.image.get_width(), obj.image.get_height())
 
                     data[obj.type].append({
                         'name': obj.name,
                         'pos': pos,
                         'dim': dim,
-                        'rotation': obj.rotation
+                        'rotation': obj.rotation,
+                        'vertical': obj.vertical,
+                        'horizontal': obj.horizontal
                     })
 
     with open(file_path, 'w') as outfile:
@@ -86,6 +88,8 @@ def save(map):
                 'name': obj.name,
                 'rect': (tile.rect[0], tile.rect[1], tile.rect[2], tile.rect[3]),
                 'dim': obj.image.get_size(),
+                'vertical': obj.vertical,
+                'horizontal': obj.horizontal,
                 'rotation': obj.rotation,
                 'type': obj.type
             })

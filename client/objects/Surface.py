@@ -9,11 +9,11 @@ template_dir = "./client/objects/templates/"
 
 
 class Surface(Object):
-    def __init__(self, pos, dim, obj_mgr, name=None, id=-1, friction=4, velocity_func="default", **kwargs):
+    def __init__(self, pos, dim, obj_mgr, name=None, id=-1, friction=4, velocity_func="default", rotation=0, **kwargs):
         self.position = pos
         self.friction = friction
         self.velocity_func = SurfaceVelocities.get_by_name(velocity_func)
-        super().__init__(pos, dim, ResourcesManager.get_image(name), id, name=name, obj_mgr=obj_mgr)
+        super().__init__(pos, dim, ResourcesManager.get_image(name), id, name=name, obj_mgr=obj_mgr, rotation=rotation)
 
     def get_rect(self):
         return pygame.Rect(self.position[0], self.position[1],

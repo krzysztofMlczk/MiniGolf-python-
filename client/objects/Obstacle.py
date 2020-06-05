@@ -17,10 +17,10 @@ template_dir = "./client/objects/templates/"
 
 class Obstacle(Object):
 
-    def __init__(self, pos, dim, obj_mgr, name=None, id=-1, elasticity=1.0,  **kwargs):
+    def __init__(self, pos, dim, obj_mgr, name=None, id=-1, elasticity=1.0, rotation=0, **kwargs):
         self.offset = None
         self.elasticity = elasticity
-        super().__init__(pos, dim, ResourcesManager.get_image(name), id, name=name, obj_mgr=obj_mgr)
+        super().__init__(pos, dim, ResourcesManager.get_image(name), id, name=name, obj_mgr=obj_mgr, rotation=rotation)
 
     def prepare_body(self, position):
         body = pymunk.body.Body(body_type=pymunk.Body.STATIC)
@@ -37,11 +37,11 @@ class Obstacle(Object):
         display.blit(self.image, flip_coords(pos))
 
     @classmethod
-    def from_template(cls, name, pos, dim, obj_mgr, vertical=1, horizontal=1, **kwargs):
+    def from_template(cls, name, pos, dim, obj_mgr, vertical=1, horizontal=1, rotation=0, **kwargs):
         with open(template_dir + name + ".yaml") as file:
             config = yaml.load(file, Loader=yaml.FullLoader)
 
         for x in range(horizontal):
             for y in range(vertical):
                 new_pos = pos[0] + x * dim[0], pos[1] + y * dim[1]
-                Obstacle(new_pos, dim, obj_mgr, **config)
+                Obstacle(new_pos, dim, obj_mgr, rotation=rotation, **config)

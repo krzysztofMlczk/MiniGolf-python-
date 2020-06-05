@@ -197,7 +197,7 @@ class MultiSetupScene(Scene):
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         elem.on_mouse_clicked()
                     elif event.type == pygame.MOUSEBUTTONUP:
-                        outcome = elem.on_mouse_released(self.players)
+                        outcome = elem.on_mouse_released(self.players, self.maps_to_play)
                         if isinstance(outcome, SceneInit):
                             self.change_scene = outcome
                         elif isinstance(outcome, int):

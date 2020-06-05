@@ -180,7 +180,7 @@ class GameScene(Scene):
         # We ignore the collision:
         return False
 
-    def setup(self, players=None, **kwargs):
+    def setup(self, players=None, maps_to_play=None, **kwargs):
         self.players = players
         self.search_for_maps()
         self.map = Map(*self.loader.next_map())

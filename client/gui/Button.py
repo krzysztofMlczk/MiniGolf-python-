@@ -29,14 +29,14 @@ class Button(GUIElement):
         self.clicked = True
         self.position = (self.position[0] + 1, self.position[1] + 1)
 
-    def on_mouse_released(self, players=None):
+    def on_mouse_released(self, players=None, maps_to_play=None):
         if self.clicked:
             self.clicked = False
             self.position = (self.position[0] - 1, self.position[1] - 1)
 
             if self.name == "single":
                 players = [Player(0, "yellow")]
-                scene_init = SceneInit("Game", players=players)
+                scene_init = SceneInit("Game", players=players, maps_to_play=5)
 
             elif self.name == "multi":
                 scene_init = SceneInit("MultiSetup", screen=self.get_current_screen())
@@ -48,7 +48,7 @@ class Button(GUIElement):
                 return -1
 
             elif self.name == "play_btn":
-                scene_init = SceneInit("Game", players=players)
+                scene_init = SceneInit("Game", players=players, maps_to_play=maps_to_play)
 
             elif self.name == "cancel_btn":
                 scene_init = SceneInit("Menu", screen=self.get_current_screen())

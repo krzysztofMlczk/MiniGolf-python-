@@ -43,7 +43,6 @@ class App:
         App.scenes["Score"] = ScoreScene(self.screen)
         App.scenes["Game"] = GameScene()
         App.current_scene = App.scenes["Menu"]
-        # App.current_scene = App.scenes["MultiSetup"]
 
     def run(self):
         """Main app loop"""
@@ -105,26 +104,9 @@ class App:
 
             if change_scene.scene_id == "Game":
                 self.stepping = True
-                App.current_scene.change_scene = None
-                App.current_scene = App.scenes["Game"]
-                App.current_scene.setup(**change_scene.kwargs)
-            elif change_scene.scene_id == "Menu":
+            else:
                 self.stepping = False
-                App.current_scene.change_scene = None
-                App.current_scene = App.scenes["Menu"]
-                App.current_scene.setup(**change_scene.kwargs)
-            elif change_scene.scene_id == "MultiSetup":
-                self.stepping = False
-                App.current_scene.change_scene = None
-                App.current_scene = App.scenes["MultiSetup"]
-                App.current_scene.setup(**change_scene.kwargs)
-            elif change_scene.scene_id == "About":
-                self.stepping = False
-                App.current_scene.change_scene = None
-                App.current_scene = App.scenes["About"]
-                App.current_scene.setup(**change_scene.kwargs)
-            elif change_scene.scene_id == "Score":
-                self.stepping = False
-                App.current_scene.change_scene = None
-                App.current_scene = App.scenes["Score"]
-                App.current_scene.setup(**change_scene.kwargs)
+
+            App.current_scene.change_scene = None
+            App.current_scene = App.scenes[change_scene.scene_id]
+            App.current_scene.setup(**change_scene.kwargs)

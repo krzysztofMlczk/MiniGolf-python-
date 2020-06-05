@@ -121,22 +121,17 @@ class ScoreScene(Scene):
                     elem.on_mouse_quit()
 
     def draw(self, screen):
-        # resize before drawing (bug occurs when window was resized and then we click "about")
-        # self.gui_mgr.resize_gui(screen)
+        self.gui_mgr.resize_gui(screen)
         self.gui_mgr.update_gui()
         self.gui_mgr.draw_gui(screen)
 
     def set_scores(self, players):
+        colors = ["white", "yellow", "pink", "orange", "blue"]
+
         for player in players:
-            x, y, s = 0, 0, 0
-            if player.color == "yellow":
-                x = 1
-            elif player.color == "pink":
-                x = 2
-            elif player.color == "orange":
-                x = 3
-            elif player.color == "blue":
-                x = 4
+            y, s = 0, 0
+            x = colors.index(player.color)
+
             for k, points in player.points.items():
                 s += points
                 Label(
@@ -149,6 +144,7 @@ class ScoreScene(Scene):
                 )
                 y += 1
             y = 7
+
             Label(
                 name="player_label",
                 dimension=(24, 24),

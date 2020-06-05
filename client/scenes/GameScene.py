@@ -144,7 +144,6 @@ class GameScene(Scene):
         self.object_mgr.destroy_all_objects()
 
         # Currently showing the same map again
-        # self.map = Map(self.players, self.object_mgr)
         next_map_details = self.loader.next_map()
         if next_map_details:
             self.map = Map(*next_map_details[0:2])
@@ -204,6 +203,7 @@ class GameScene(Scene):
 
         self.players[0].ball.turn = True
         print("Player 0 to move")
+
         self.show_score()
         self.object_mgr.blit_on_display(self.object_mgr.draw_static_object())
 
@@ -219,15 +219,20 @@ class GameScene(Scene):
         label = self.font.render(text, 1, (255, 255, 255), (0, 0, 0))
         self.object_mgr.display.blit(label, (96, 4))
         offset = 664
+
         for player in self.players:
             if player.ball.turn:
                 pygame.draw.rect(self.object_mgr.display, (240, 50, 50), (offset-2, 2, 60, 60), 2)
             else:
                 pygame.draw.rect(self.object_mgr.display, self.background_color, (offset-2, 2, 60, 60), 2)
+
             ball_img = ResourcesManager.get_image('obj_ball_' + player.color)
             ball_img = pygame.transform.scale(ball_img, (56, 56))
+
             self.object_mgr.display.blit(ball_img, (offset, 4))
+
             label = self.font.render(str(sum(v for k, v in player.points.items())), 1, (0, 0, 0))
             label = pygame.transform.scale(label, (48, 56))
+
             self.object_mgr.display.blit(label, (offset+4, 4))
             offset += 70

@@ -1,3 +1,4 @@
 name: "dirt"
 friction: 8.0
 function: "wobble"
+type: "surfaces"

@@ -1,66 +1,14 @@
 import os
 import copy
+import yaml
 
 import pygame
 import pymunk
 
 from client.scenes.Scene import Scene
 from client.resources.ResourcesManager import ResourcesManager
+from editor.Structures import Object, Button, ToolIcon, MapTile
 from editor import FileUtils
-
-
-class Object:
-    def __init__(self, image, name, rot):
-        self.image = image
-        self.name = name
-        self.rotation = rot
-
-
-class Button:
-    def __init__(self, image, pos):
-        self.image = image
-        self.pos = pos
-        self.rect = pygame.Rect(pos[0], pos[1], image.get_width(), image.get_height())
-
-    def clicked(self, pos):
-        return self.rect.collidepoint(*pos)
-
-
-class ToolIcon:
-    def __init__(self, obj, rect):
-        self.object = obj
-        self.rect = rect
-
-
-class MapTile:
-    def __init__(self, rect, obj):
-        self.rect = rect
-
-        self.objects = []
-        if obj is not None:
-            self.add_object(obj)
-
-    def add_object(self, obj):
-        for o in self.objects:
-            if o.name == obj.name:
-                return
-        self.objects.append(obj)
-
-    def remove_object(self, obj):
-        for o in self.objects:
-            if o.name == obj.name:
-                self.objects.remove(o)
-
-    def clear_objects(self):
-        self.objects.clear()
-
-    def has_object(self):
-        return len(self.objects) > 0
-
-    def rotate_object(self, obj, rot):
-        for o in self.objects:
-            if o.name == obj.name:
-                o.rotation = (o.rotation + rot) % 360
 
 
 class EditorScene(Scene):
@@ -78,6 +26,7 @@ class EditorScene(Scene):
         self.toolbox = self.load_objects()
         self.curr_obj = ToolIcon(None, None)
 
+        self.button_export = Button(ResourcesManager.get_image('export_icon'), (self.screen_dim[0] - 184, 10))
         self.button_save = Button(ResourcesManager.get_image('save_icon'), (self.screen_dim[0] - 142, 10))
         self.button_load = Button(ResourcesManager.get_image('load_icon'), (self.screen_dim[0] - 100, 10))
 
@@ -100,9 +49,11 @@ class EditorScene(Scene):
             if event.button == pygame.BUTTON_LEFT:
                 # Button click:
                 if self.button_save.clicked(mouse_pos):
-                    FileUtils.save()
+                    FileUtils.save(self.grid)
                 elif self.button_load.clicked(mouse_pos):
-                    FileUtils.load()
+                    FileUtils.load(self.grid)
+                elif self.button_export.clicked(mouse_pos):
+                    FileUtils.export(self.grid)
 
                 # Placing new object:
                 clicked_toolbox = self.get_toolbox_tile(mouse_pos)
@@ -194,18 +145,24 @@ class EditorScene(Scene):
             for filename in filenames:
                 if filename.endswith('.yaml'):
                     name = os.path.splitext(filename)[0]
-                    obj = Object(pygame.transform.scale(ResourcesManager.get_image(name), (32, 32)), name, 0)
+
+                    yaml_file = open(os.path.join(root, filename))
+                    parsed_yaml_file = yaml.load(yaml_file, Loader=yaml.FullLoader)
+                    t = parsed_yaml_file["type"]
+                    yaml_file.close()
+
+                    obj = Object(pygame.transform.scale(ResourcesManager.get_image(name), (32, 32)), name, 0, t)
                     icon = ToolIcon(obj, pygame.Rect(200 + off * 32, 5, 32, 32))
 
                     objects[name] = icon
                     off += 1
 
         objects['cup'] = ToolIcon(Object(pygame.transform.scale(ResourcesManager.get_image('obj_hole'),
-                                                                (32, 32)), 'cup', 0),
+                                                                (32, 32)), 'obj_hole', 0, 'cup'),
                                   pygame.Rect(200 + off * 32, 5, 32, 32))
         off += 1
         objects['ball'] = ToolIcon(Object(pygame.transform.scale(ResourcesManager.get_image('obj_ball_white'),
-                                                                 (32, 32)), 'ball', 0),
+                                                                 (32, 32)), 'obj_ball_white', 0, 'ball'),
                                    pygame.Rect(200 + off * 32, 5, 32, 32))
         off += 1
 
@@ -226,6 +183,7 @@ class EditorScene(Scene):
         screen.blit(self.font.render(name, False, (255, 200, 200)), (5, 30))
 
         # Draw save/load buttons:
+        screen.blit(self.button_export.image, self.button_export.pos)
         screen.blit(self.button_save.image, self.button_save.pos)
         screen.blit(self.button_load.image, self.button_load.pos)
 

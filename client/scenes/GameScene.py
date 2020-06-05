@@ -154,7 +154,7 @@ class GameScene(Scene):
         # Resetting balls and adding them back to simulation space
         for player in self.players:
             player.ball.state = BallState.NOT_MOVING
-            player.ball.shape.body.position = Vec2d(next_map_details[2])
+            player.ball.shape.body.position = Vec2d(next_map_details[2]['pos'])
             player.ball.shape.body.velocity = Vec2d(0.0, 0.0)
             self.object_mgr.register_object(player.ball)
             print("Player {} points: {}".format(player.id, player.points))
@@ -193,7 +193,7 @@ class GameScene(Scene):
         self.map = Map(*map_details[0:2])
 
         for player in self.players:
-            player.ball = Ball((map_details[2]), (32, 32), color=player.color, obj_mgr=self.object_mgr)
+            player.ball = Ball(map_details[2]['pos'], map_details[2]['dim'], color=player.color, obj_mgr=self.object_mgr)
 
         # We need a custom collision handler for ball here:
         self.object_mgr.space.add_collision_handler(1, 2).pre_solve = self.ball_in_cup

@@ -20,12 +20,13 @@ def export(map):
     if len(file_path) == 0 or file_path == "()":
         return
 
-    data = {}
-    data['id'] = map_id
-    data['obstacles'] = []
-    data['surfaces'] = []
-    data['cup'] = {}
-    data['ball'] = {}
+    data = {
+        "id": map_id,
+        "obstacles": [],
+        "surfaces": [],
+        "cup": {},
+        "ball": {}
+    }
 
     for tile in map:
         if tile.has_object():
@@ -73,8 +74,9 @@ def save(map):
     if len(file_path) == 0 or file_path == "()":
         return
 
-    data = {}
-    data['map'] = []
+    data = {
+        'map': []
+    }
 
     for tile in map:
         obj_list = []

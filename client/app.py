@@ -9,6 +9,7 @@ from client.scenes.GameScene import GameScene
 from client.resources.ResourcesManager import ResourcesManager
 from client.scenes.MainMenuScene import MainMenuScene
 from client.scenes.MultiSetupScene import MultiSetupScene
+from client.scenes.ScoreScene import ScoreScene
 
 
 class App:
@@ -39,6 +40,7 @@ class App:
         App.scenes["Menu"] = MainMenuScene(self.screen)
         App.scenes["MultiSetup"] = MultiSetupScene(self.screen)
         App.scenes["About"] = AboutScene(self.screen)
+        App.scenes["Score"] = ScoreScene(self.screen)
         App.scenes["Game"] = GameScene()
         App.current_scene = App.scenes["Menu"]
         # App.current_scene = App.scenes["MultiSetup"]
@@ -106,22 +108,23 @@ class App:
                 App.current_scene.change_scene = None
                 App.current_scene = App.scenes["Game"]
                 App.current_scene.setup(**change_scene.kwargs)
-
             elif change_scene.scene_id == "Menu":
                 self.stepping = False
                 App.current_scene.change_scene = None
                 App.current_scene = App.scenes["Menu"]
                 App.current_scene.setup(**change_scene.kwargs)
             elif change_scene.scene_id == "MultiSetup":
-
                 self.stepping = False
                 App.current_scene.change_scene = None
                 App.current_scene = App.scenes["MultiSetup"]
                 App.current_scene.setup(**change_scene.kwargs)
             elif change_scene.scene_id == "About":
-
                 self.stepping = False
                 App.current_scene.change_scene = None
                 App.current_scene = App.scenes["About"]
                 App.current_scene.setup(**change_scene.kwargs)
-
+            elif change_scene.scene_id == "Score":
+                self.stepping = False
+                App.current_scene.change_scene = None
+                App.current_scene = App.scenes["Score"]
+                App.current_scene.setup(**change_scene.kwargs)

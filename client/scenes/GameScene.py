@@ -18,7 +18,7 @@ class GameScene(Scene):
 
     def __init__(self):
         super().__init__(pymunk.Space())
-        self.bacground_color = (0, 0, 0)
+        self.background_color = (0, 0, 0)
         self.scoreboards = dict()
         self.loader = Loader(self.object_mgr)
         self.next = None
@@ -149,7 +149,7 @@ class GameScene(Scene):
         if next_map_details:
             self.map = Map(*next_map_details[0:2])
         else:
-            self.change_scene = SceneInit("Menu")
+            self.change_scene = SceneInit("Score", players=self.players)
             return
 
         # Resetting balls and adding them back to simulation space
@@ -223,7 +223,7 @@ class GameScene(Scene):
             if player.ball.turn:
                 pygame.draw.rect(self.object_mgr.display, (240, 50, 50), (offset-2, 2, 60, 60), 2)
             else:
-                pygame.draw.rect(self.object_mgr.display, self.bacground_color, (offset-2, 2, 60, 60), 2)
+                pygame.draw.rect(self.object_mgr.display, self.background_color, (offset-2, 2, 60, 60), 2)
             ball_img = ResourcesManager.get_image('obj_ball_' + player.color)
             ball_img = pygame.transform.scale(ball_img, (56, 56))
             self.object_mgr.display.blit(ball_img, (offset, 4))

@@ -24,18 +24,41 @@ def export(map):
     data['id'] = map_id
     data['obstacles'] = []
     data['surfaces'] = []
-    data['cup'] = []
-    data['ball'] = []
+    data['cup'] = {}
+    data['ball'] = {}
 
     for tile in map:
         if tile.has_object():
             for obj in tile.objects:
-                data[obj.type].append({
-                    'name': obj.name,
-                    'pos': (tile.rect[0], tile.rect[1]),
-                    'dim': obj.image.get_size(),
-                    'rotation': obj.rotation
-                })
+                if obj.type == 'cup':
+                    pos = (tile.rect[0] + obj.image.get_width() // 2,
+                           tile.rect[1] + obj.image.get_height() // 2)
+                    dim = obj.image.get_size()
+
+                    data['cup']['name'] = obj.name
+                    data['cup']['pos'] = pos
+                    data['cup']['dim'] = dim
+                    data['cup']['rotation'] = obj.rotation
+
+                elif obj.type == 'ball':
+                    pos = (tile.rect[0] + obj.image.get_width() // 2,
+                           tile.rect[1] + obj.image.get_height() // 2)
+                    dim = (obj.image.get_width() // 2, obj.image.get_height() // 2)
+
+                    data['ball']['name'] = obj.name
+                    data['ball']['pos'] = pos
+                    data['ball']['dim'] = dim
+                    data['ball']['rotation'] = obj.rotation
+                else:
+                    pos = (tile.rect[0], tile.rect[1])
+                    dim = obj.image.get_size()
+
+                    data[obj.type].append({
+                        'name': obj.name,
+                        'pos': pos,
+                        'dim': dim,
+                        'rotation': obj.rotation
+                    })
 
     with open(file_path, 'w') as outfile:
         json.dump(data, outfile)

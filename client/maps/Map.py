@@ -2,7 +2,6 @@ from client.objects.ObjectCup import ObjectCup
 from client.objects.Ball import Ball
 
 
-
 class Map:
     def __init__(self, id, cup):
         # TODO

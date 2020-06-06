@@ -20,22 +20,48 @@ def export(map):
     if len(file_path) == 0 or file_path == "()":
         return
 
-    data = {}
-    data['id'] = map_id
-    data['obstacles'] = []
-    data['surfaces'] = []
-    data['cup'] = []
-    data['ball'] = []
+    data = {
+        "id": map_id,
+        "obstacles": [],
+        "surfaces": [],
+        "cup": {},
+        "ball": {}
+    }
 
     for tile in map:
         if tile.has_object():
             for obj in tile.objects:
-                data[obj.type].append({
-                    'name': obj.name,
-                    'pos': (tile.rect[0], tile.rect[1]),
-                    'dim': obj.image.get_size(),
-                    'rotation': obj.rotation
-                })
+                if obj.type == 'cup':
+                    pos = (tile.rect[0] + obj.image.get_width() // 2,
+                           tile.rect[1] + obj.image.get_height() // 2)
+                    dim = obj.image.get_size()
+
+                    data['cup']['name'] = obj.name
+                    data['cup']['pos'] = pos
+                    data['cup']['dim'] = dim
+                    data['cup']['rotation'] = obj.rotation
+
+                elif obj.type == 'ball':
+                    pos = (tile.rect[0] + obj.image.get_width() // 2,
+                           tile.rect[1] + obj.image.get_height() // 2)
+                    dim = (obj.image.get_width() // 2, obj.image.get_height() // 2)
+
+                    data['ball']['name'] = obj.name
+                    data['ball']['pos'] = pos
+                    data['ball']['dim'] = dim
+                    data['ball']['rotation'] = obj.rotation
+                else:
+                    pos = (tile.rect[0], tile.rect[1])
+                    dim = (obj.image.get_width(), obj.image.get_height())
+
+                    data[obj.type].append({
+                        'name': obj.name,
+                        'pos': pos,
+                        'dim': dim,
+                        'rotation': obj.rotation,
+                        'vertical': obj.vertical,
+                        'horizontal': obj.horizontal
+                    })
 
     with open(file_path, 'w') as outfile:
         json.dump(data, outfile)
@@ -50,8 +76,9 @@ def save(map):
     if len(file_path) == 0 or file_path == "()":
         return
 
-    data = {}
-    data['map'] = []
+    data = {
+        'map': []
+    }
 
     for tile in map:
         obj_list = []
@@ -61,6 +88,8 @@ def save(map):
                 'name': obj.name,
                 'rect': (tile.rect[0], tile.rect[1], tile.rect[2], tile.rect[3]),
                 'dim': obj.image.get_size(),
+                'vertical': obj.vertical,
+                'horizontal': obj.horizontal,
                 'rotation': obj.rotation,
                 'type': obj.type
             })
@@ -93,6 +122,7 @@ def load(map):
 
             for obj in obj_list:
                 tile.add_object(Object(pygame.transform.scale(ResourcesManager.get_image(obj['name']),
-                                                              obj['dim']), obj['name'], obj['rotation'], obj['type']))
+                                                              obj['dim']), obj['name'], obj['rotation'], obj['type'],
+                                       horiz=obj['horizontal'], vert=obj['vertical']))
 
             map[i] = tile

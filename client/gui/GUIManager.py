@@ -1,8 +1,8 @@
-
-
 # Class responsible for holding the list of all GUI elements on the scene
 # and updating them. Self registration is enabled by default, that means
 # each newly created element is automatically being registered.
+
+
 class GUIManager:
     def __init__(self):
         self.gui_elements = []

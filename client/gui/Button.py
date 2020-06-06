@@ -2,7 +2,6 @@ import pygame
 
 from client.gui.GUIElement import GUIElement
 from client.models.scene_init import SceneInit
-from client.models.player import Player
 
 
 class Button(GUIElement):
@@ -35,8 +34,7 @@ class Button(GUIElement):
             self.position = (self.position[0] - 1, self.position[1] - 1)
 
             if self.name == "single":
-                players = [Player(0, "yellow")]
-                scene_init = SceneInit("Game", players=players, maps_to_play=5)
+                scene_init = SceneInit("SingleSetup", screen=self.get_current_screen())
 
             elif self.name == "multi":
                 scene_init = SceneInit("MultiSetup", screen=self.get_current_screen())
@@ -57,6 +55,7 @@ class Button(GUIElement):
                 scene_init = SceneInit("About", screen=self.get_current_screen())
 
             elif self.name == "quit":
+                scene_init = None
                 exit(0)
 
             else:
@@ -94,4 +93,3 @@ class Button(GUIElement):
     def get_current_screen(self):
         info = pygame.display.Info()
         return pygame.display.set_mode((info.current_w, info.current_h), pygame.RESIZABLE)
-

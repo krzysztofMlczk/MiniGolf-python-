@@ -2,11 +2,23 @@ import pygame
 
 
 class Object:
-    def __init__(self, image, name, rot, t):
+    def __init__(self, image, name, rot, t, horiz=1, vert=1):
         self.image = image
         self.name = name
         self.rotation = rot
+        self.horizontal = horiz
+        self.vertical = vert
         self.type = t
+
+    def overlap_image(self):
+        img = pygame.Surface((self.image.get_width() * self.horizontal,
+                              self.image.get_height() * self.vertical))
+
+        for y in range(self.vertical):
+            for x in range(self.horizontal):
+                img.blit(self.image, (x * self.image.get_width(), y * self.image.get_height()))
+
+        return img
 
 
 class Button:

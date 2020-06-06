@@ -48,7 +48,7 @@ class ObjectManager:
 
         return display
 
-    def draw_static_object(self):
+    def draw_static_objects(self):
         display = self.display.copy()
 
         for obj in self.objects:
@@ -71,9 +71,9 @@ class ObjectManager:
 
     def clear_display(self, fill_color=None):
         if fill_color:
-            self.display = pygame.Surface.fill(color=fill_color)
+            self.display.fill(fill_color)
         else:
-            self.display = pygame.Surface.fill(color=pygame.Color(0, 0, 0, 0))
+            self.display.fill((0, 0, 0))
 
     def move_to_front(self, obj):
         try:

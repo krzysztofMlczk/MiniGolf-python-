@@ -1,6 +1,7 @@
 import os
 import copy
 import yaml
+import math
 
 import pygame
 import pymunk
@@ -14,24 +15,32 @@ from editor import FileUtils
 class EditorScene(Scene):
     def __init__(self, screen_dim):
         super().__init__(pymunk.Space())
+        pygame.font.init()
+        self.font = pygame.font.SysFont('Comic Sans MS', 30)
+
         # Distance of mouse pointer from screen border that forces camera movement:
         self.dist_camera_mv = 200
 
         self.grid_size = None
+        self.grid_dimension = None
+        self.block_size = 32
         self.grid_pos = (0, 0)
         self.grid = []
         self.screen_dim = screen_dim
         self.generate_grid()
 
-        self.toolbox = self.load_objects()
+        self.dragging = None
+
+        self.text_current_orig = (5, 5)
+        self.text_current = self.font.render('Current object:', False, (255, 255, 255))
+        self.text_obj_orig = (self.text_current_orig[0], self.text_current_orig[1] + self.text_current.get_height())
+
+        self.toolbox = self.load_objects(self.text_obj_orig[0] + self.text_current.get_width() + 50)
         self.curr_obj = ToolIcon(None, None)
 
         self.button_export = Button(ResourcesManager.get_image('export_icon'), (self.screen_dim[0] - 184, 10))
         self.button_save = Button(ResourcesManager.get_image('save_icon'), (self.screen_dim[0] - 142, 10))
         self.button_load = Button(ResourcesManager.get_image('load_icon'), (self.screen_dim[0] - 100, 10))
-
-        pygame.font.init()
-        self.font = pygame.font.SysFont('Comic Sans MS', 30)
 
     def draw(self, screen):
         self.move_camera(pygame.mouse.get_pos())
@@ -39,11 +48,27 @@ class EditorScene(Scene):
         self.display.fill((0, 0, 0))
         self.draw_grid(screen)
 
+        if self.dragging is not None:
+            hover = self.get_grid_tile(pygame.mouse.get_pos())
+
+            if hover is not None:
+                width = self.grid[hover].rect[0] - self.grid[self.dragging[0]].rect[0]
+                if width < 0:
+                    width = 0
+                height = self.grid[hover].rect[1] - self.grid[self.dragging[0]].rect[1]
+                if height < 0:
+                    height = 0
+                pygame.draw.rect(screen, (200, 0, 0), pygame.Rect(self.grid[self.dragging[0]].rect[0],
+                                                                  self.grid[self.dragging[0]].rect[1],
+                                                                  (width + self.block_size * (width >= 0)),
+                                                                  (height + self.block_size * (height >= 0))), 2)
+
         self.display_gui(screen)
 
     def handle_event(self, event):
         """Handling specific scene events"""
         mouse_pos = pygame.mouse.get_pos()
+        shift = pygame.key.get_pressed()[pygame.K_LSHIFT]
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == pygame.BUTTON_LEFT:
@@ -51,6 +76,7 @@ class EditorScene(Scene):
                 if self.button_save.clicked(mouse_pos):
                     FileUtils.save(self.grid)
                 elif self.button_load.clicked(mouse_pos):
+                    self.generate_grid()
                     FileUtils.load(self.grid)
                 elif self.button_export.clicked(mouse_pos):
                     FileUtils.export(self.grid)
@@ -62,11 +88,46 @@ class EditorScene(Scene):
                 if clicked_toolbox is not None:
                     self.curr_obj = clicked_toolbox
                 elif clicked_tile_index is not None and self.curr_obj.object is not None:
-                    obj = copy.copy(self.curr_obj.object)
-                    obj.rotation = 0
-                    self.grid[clicked_tile_index].add_object(obj)
+                    if shift:
+                        self.dragging = [clicked_tile_index, None]
+                    else:
+                        obj = copy.copy(self.curr_obj.object)
+                        obj.rotation = 0
+                        self.grid[clicked_tile_index].add_object(obj)
 
-            # Deleting object:
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == pygame.BUTTON_LEFT:
+                clicked_tile_index = self.get_grid_tile(mouse_pos)
+
+                if self.dragging is not None:
+                    if clicked_tile_index is None:
+                        self.dragging = None
+                    else:
+                        self.dragging[1] = clicked_tile_index
+                        start_cords = [self.dragging[0] // self.grid_dimension[1],
+                                       self.dragging[0] % self.grid_dimension[1]]
+                        end_cords = [self.dragging[1] // self.grid_dimension[1],
+                                     self.dragging[1] % self.grid_dimension[1]]
+
+                        if start_cords[0] == end_cords[0] and start_cords[1] == end_cords[1]:
+                            obj = copy.copy(self.curr_obj.object)
+                            obj.rotation = 0
+                            self.grid[clicked_tile_index].add_object(obj)
+
+                        elif start_cords[0] <= end_cords[0] and start_cords[1] <= end_cords[1]:
+
+                            obj = copy.copy(self.curr_obj.object)
+                            obj.rotation = 0
+                            obj.vertical = abs(end_cords[1] - start_cords[1]) + \
+                                           int(math.copysign(1, end_cords[1] - start_cords[1]))
+                            obj.horizontal = abs(end_cords[0] - start_cords[0]) + \
+                                             int(math.copysign(1, end_cords[0] - start_cords[0]))
+
+                            self.grid[self.dragging[0]].add_object(obj)
+
+                        self.dragging = None
+
+                        # Deleting object:
             elif event.button == pygame.BUTTON_RIGHT:
                 clicked_tile_index = self.get_grid_tile(mouse_pos)
                 if clicked_tile_index is not None:
@@ -91,6 +152,8 @@ class EditorScene(Scene):
                 self.grid.append(MapTile(rect, None))
 
         self.grid_size = (dim[0] * block_size, dim[1] * block_size)
+        self.grid_dimension = dim
+        self.block_size = block_size
 
     def apply_offset(self, offset):
         for i in range(len(self.grid)):
@@ -105,12 +168,20 @@ class EditorScene(Scene):
             if not tile.has_object():
                 pygame.draw.rect(screen, (255, 255, 255), tile.rect, 1)
             else:
-                img = pygame.Surface(tile.objects[0].image.get_size())
                 for obj in tile.objects:
-                    img.blit(pygame.transform.rotate(obj.image, obj.rotation), (0, 0))
+                    if obj.vertical != 1 or obj.horizontal != 1:
+                        screen.blit(pygame.transform.rotate(obj.overlap_image(), obj.rotation),
+                                    (tile.rect[0], tile.rect[1]))
+                        pygame.draw.rect(screen, (200, 200, 0), tile.rect, 3)
+                    else:
+                        screen.blit(pygame.transform.rotate(obj.image, obj.rotation),
+                                    (tile.rect[0], tile.rect[1]))
 
-                screen.blit(img,
-                            (tile.rect[0], tile.rect[1]))
+    def get_tile(self, x, y):
+        index = y + x * self.grid_dimension[1]
+        if 0 <= index < self.grid_dimension[0] * self.grid_dimension[1]:
+            return self.grid[index]
+        return None
 
     def move_camera(self, mouse_pos):
         cam_mv = (0, 0)
@@ -138,7 +209,7 @@ class EditorScene(Scene):
             self.apply_offset(offset)
 
     @staticmethod
-    def load_objects():
+    def load_objects(origin):
         objects = {}
         off = 0
         for root, dirnames, filenames in os.walk('./client/objects/templates'):
@@ -152,7 +223,7 @@ class EditorScene(Scene):
                     yaml_file.close()
 
                     obj = Object(pygame.transform.scale(ResourcesManager.get_image(name), (32, 32)), name, 0, t)
-                    icon = ToolIcon(obj, pygame.Rect(200 + off * 32, 5, 32, 32))
+                    icon = ToolIcon(obj, pygame.Rect(origin + off * 32, 5, 32, 32))
 
                     objects[name] = icon
                     off += 1
@@ -160,32 +231,33 @@ class EditorScene(Scene):
         objects['cup'] = ToolIcon(
             Object(pygame.transform.scale(
                 ResourcesManager.get_image('obj_hole'), (32, 32)
-            ), 'obj_hole', 0, 'cup'), pygame.Rect(200 + off * 32, 5, 32, 32)
+            ), 'obj_hole', 0, 'cup'), pygame.Rect(origin + off * 32, 5, 32, 32)
         )
         off += 1
 
         objects['ball'] = ToolIcon(
             Object(pygame.transform.scale(
                 ResourcesManager.get_image('obj_ball_white'), (32, 32)
-            ), 'obj_ball_white', 0, 'ball'), pygame.Rect(200 + off * 32, 5, 32, 32)
+            ), 'obj_ball_white', 0, 'ball'), pygame.Rect(origin + off * 32, 5, 32, 32)
         )
         off += 1
 
         return objects
 
     def display_gui(self, screen):
-        # Draw toolbox:
-        screen.blit(self.font.render('Current object:', False, (255, 255, 255)), (5, 5))
-
-        for tool in self.toolbox.values():
-            screen.blit(tool.object.image, (tool.rect[0], tool.rect[1]))
-
         if self.curr_obj.object is not None:
             name = self.curr_obj.object.name
         else:
             name = 'None'
 
-        screen.blit(self.font.render(name, False, (255, 200, 200)), (5, 30))
+        # Draw object description:
+
+        screen.blit(self.text_current, self.text_current_orig)
+        screen.blit(self.font.render(name, False, (255, 200, 200)), self.text_obj_orig)
+
+        # Draw toolbox:
+        for tool in self.toolbox.values():
+            screen.blit(tool.object.image, (tool.rect[0], tool.rect[1]))
 
         # Draw save/load buttons:
         screen.blit(self.button_export.image, self.button_export.pos)

@@ -10,22 +10,26 @@ from client.resources.ResourcesManager import ResourcesManager
 from client.models.player import Player
 
 
-class MultiSetupScene(Scene):
+class SetupScene(Scene):
     """Scene for drawing scene for setting up multiplayer game"""
 
     available_colors = ["yellow", "orange", "blue", "pink", "white"]
     available_players_id = [0, 1, 2, 3, 4]
 
-    def __init__(self, screen):
+    def __init__(self, screen, multi):
         super().__init__(None)
         self.change_scene = None
+        self.multi = multi
         self.setup_components()
         self.players_amount = 2
         self.maps_to_play = 1
         self.players = []
-        # we have 2 players by default
+        
+        # Add one player
         self.add_player()
-        self.add_player()
+
+        if self.multi:
+            self.add_player()
 
         self.gui_mgr.resize_gui(screen)
 
@@ -34,15 +38,8 @@ class MultiSetupScene(Scene):
         width, height = 1920, 1080
 
         # Setup up background, title and clouds
-        background = Label(
-            name="background",
-            dimension=(width, height),
-            position=(0, 0),
-            image=ResourcesManager.get_image("background"),
-            obj_mgr=self.gui_mgr,
-            default_res=(width, height)
-        )
-
+        self.add_label("background", (width, height), (0, 0), "background", (width, height))
+        
         left_cloud = Cloud(
             position=(92, 175),
             dimension=(595, 259),
@@ -66,128 +63,57 @@ class MultiSetupScene(Scene):
             obj_mgr=self.gui_mgr,
             default_res=(width, height)
         )
-
-        title = Label(
-            name="title",
-            dimension=(width, height),
-            position=(0, 0),
-            image=ResourcesManager.get_image("title"),
-            obj_mgr=self.gui_mgr,
-            default_res=(width, height)
-        )
+        
+        self.add_label("title", (width, height), (0, 0), "title", (width, height))
 
         # setup labels
         etiquette_size = (416, 100)
         numbers_size = (100, 100)
 
-        # label which displays title "Players: "
-        players_label = Label(
-            name="players_label",
-            dimension=etiquette_size,
-            position=(702, 467),
-            image=ResourcesManager.get_image("players_label"),
-            obj_mgr=self.gui_mgr,
-            default_res=(width, height)
-        )
-
-        # label which displays title "Maps: "
-        maps_label = Label(
-            name="maps_label",
-            dimension=etiquette_size,
-            position=(702, 617),
-            image=ResourcesManager.get_image("maps_label"),
-            obj_mgr=self.gui_mgr,
-            default_res=(width, height)
-        )
-
-        # label which displays amount of players
-        players_amount = Label(
-            name="players_amount",
-            dimension=numbers_size,
-            position=(1118, 467),
-            # we start off with 2 players and maksimum of 5 players
-            image=ResourcesManager.get_image("amount_2"),
-            obj_mgr=self.gui_mgr,
-            default_res=(width, height)
-        )
-
-        # label which displays amount of maps to be played
-        maps_amount = Label(
-            name="maps_amount",
-            dimension=numbers_size,
-            position=(1118, 617),
-            # we play 1 map by default on multiplayer mode
-            image=ResourcesManager.get_image("amount_1"),
-            obj_mgr=self.gui_mgr,
-            default_res=(width, height)
-        )
-
         # setup buttons
         up_down_btn_size = (50, 50)
-        # buttons for players amount
-        players_up = Button(
-            name="players_up",
-            dimension=up_down_btn_size,
-            position=(1218, 467),
-            image=ResourcesManager.get_image("btn_up"),
-            image_hover=ResourcesManager.get_image("btn_up_hover"),
-            obj_mgr=self.gui_mgr,
-            default_res=(width, height)
-        )
 
-        players_down = Button(
-            name="players_down",
-            dimension=up_down_btn_size,
-            position=(1218, 517),
-            image=ResourcesManager.get_image("btn_down"),
-            image_hover=ResourcesManager.get_image("btn_down_hover"),
-            obj_mgr=self.gui_mgr,
-            default_res=(width, height)
-        )
-
-        # buttons for maps amount
-        maps_up = Button(
-            name="maps_up",
-            dimension=up_down_btn_size,
-            position=(1218, 617),
-            image=ResourcesManager.get_image("btn_up"),
-            image_hover=ResourcesManager.get_image("btn_up_hover"),
-            obj_mgr=self.gui_mgr,
-            default_res=(width, height)
-        )
-
-        maps_down = Button(
-            name="maps_down",
-            dimension=up_down_btn_size,
-            position=(1218, 667),
-            image=ResourcesManager.get_image("btn_down"),
-            image_hover=ResourcesManager.get_image("btn_down_hover"),
-            obj_mgr=self.gui_mgr,
-            default_res=(width, height)
-        )
         # setup lower buttons
         lower_button_size = (268, 100)
 
-        play_btn = Button(
-            name="play_btn",
-            dimension=lower_button_size,
-            position=(1000, 767),
-            image=ResourcesManager.get_image("btn_play"),
-            image_hover=ResourcesManager.get_image("btn_play_hover"),
-            obj_mgr=self.gui_mgr,
-            default_res=(width, height)
-        )
+        # Setting up players choice
+        if self.multi:
+            self.add_label("players_label", etiquette_size, (702, 467), "players_label", (width, height))
+            self.add_label("players_amount", numbers_size, (1118, 467), "amount_2", (width, height))
+            self.add_button("players_up", up_down_btn_size, (1218, 467), "btn_up", (width, height))
+            self.add_button("players_down", up_down_btn_size, (1218, 517), "btn_down", (width, height))
 
-        cancel_btn = Button(
-            name="cancel_btn",
-            dimension=lower_button_size,
-            position=(702, 767),
-            image=ResourcesManager.get_image("btn_cancel"),
-            image_hover=ResourcesManager.get_image("btn_cancel_hover"),
-            obj_mgr=self.gui_mgr,
-            default_res=(width, height)
-        )
+        # Setting up maps choice
+        self.add_label("maps_label", etiquette_size, (702, 617), "maps_label", (width, height))
+        self.add_label("maps_amount", numbers_size, (1118, 617), "amount_1", (width, height))
+        self.add_button("maps_up", up_down_btn_size, (1218, 617), "btn_up", (width, height))
+        self.add_button("maps_down", up_down_btn_size, (1218, 667), "btn_down", (width, height))
 
+        # Setting up lower buttons
+        self.add_button("play_btn", lower_button_size, (1000, 767), "btn_play", (width, height))
+        self.add_button("cancel_btn", lower_button_size, (702, 767), "btn_cancel", (width, height))
+    
+    def add_label(self, name, dim, pos, image, res):
+        Label(
+            name=name,
+            dimension=dim,
+            position=pos,
+            image=ResourcesManager.get_image(image),
+            obj_mgr=self.gui_mgr,
+            default_res=res
+        )
+    
+    def add_button(self, name, dim, pos, image, res):
+        Button(
+            name=name,
+            dimension=dim,
+            position=pos,
+            image=ResourcesManager.get_image(image),
+            image_hover=ResourcesManager.get_image(image + "_hover"),
+            obj_mgr=self.gui_mgr,
+            default_res=res
+        )
+        
     def handle_event(self, event):
         for elem in self.gui_mgr.gui_elements:
 
@@ -247,6 +173,3 @@ class MultiSetupScene(Scene):
                     new_image = ResourcesManager.get_image("amount_" + str(self.maps_to_play))
                     element.set_image_original(new_image)
                     element.set_size(element.get_size())
-
-
-

@@ -17,9 +17,7 @@ class GameScene(Scene):
     """Scene for drawing and handling game events"""
 
     def __init__(self):
-        super().__init__(pymunk.Space())
-        self.background_color = (0, 0, 0)
-        self.scoreboards = dict()
+        super().__init__(pymunk.Space(), fill_color = (0, 50, 0))
         self.loader = Loader(self.object_mgr)
         self.next = None
         self.map = None
@@ -66,11 +64,11 @@ class GameScene(Scene):
                     # If its ball's turn and all balls are still, let the ball be clicked to hit
                     if ball.turn and self.balls_not_moving():
                         pos = ball.shape.body.position
+                        ball.state = BallState.CLICKED
                         self.trajectory = [(flip_coords(pos)[0] + self.camera_offset[0],
                                             flip_coords(pos)[1] + self.camera_offset[1]),
                                            (flip_coords(pos)[0] + self.camera_offset[0],
                                             flip_coords(pos)[1] + self.camera_offset[1])]
-                        ball.state = BallState.CLICKED
 
         elif event.type == pygame.MOUSEBUTTONUP:
 
@@ -104,6 +102,7 @@ class GameScene(Scene):
             self.trajectory[1] = pygame.mouse.get_pos()
 
     def handle_camera_movement(self):
+        """Handling movement of camera with arrow keys"""
         if self.trajectory is not None:
             return
 
@@ -175,7 +174,7 @@ class GameScene(Scene):
 
         # Clean the map:
         self.object_mgr.destroy_all_objects()
-        self.object_mgr.clear_display((0, 0, 0))
+        self.object_mgr.clear_display(self.fill_color)
 
         # Currently showing the same map again
         next_map_details = self.loader.next_map()
@@ -188,7 +187,7 @@ class GameScene(Scene):
         # Resetting balls and adding them back to simulation space
         for player in self.players:
             player.ball.state = BallState.NOT_MOVING
-            player.ball.shape.body.position = Vec2d(next_map_details[2]['pos'])
+            player.ball.shape.body.position = Vec2d(flip_coords(next_map_details[2]['pos']))
             player.ball.shape.body.velocity = Vec2d(0.0, 0.0)
             self.object_mgr.register_object(player.ball)
             print("Player {} points: {}".format(player.id, player.points))
@@ -223,6 +222,7 @@ class GameScene(Scene):
     def setup(self, players=None, maps_to_play=None, **kwargs):
         self.players = players
         self.search_for_maps(maps_to_play)
+
         map_details = self.loader.next_map()
         self.map = Map(*map_details[0:2])
 
@@ -243,14 +243,18 @@ class GameScene(Scene):
 
     def search_for_maps(self, count):
         levels = map_search('./client/levels')
+
         for lvl in levels:
-            if 0 < count:
-                self.loader.add_map_file(lvl)
-                count -= 0
+            self.loader.add_map_file(lvl)
+            count -= 1
+
+            if count <= 0:
+                return
+
 
     def show_score(self):
         text = 'level: ' + str(self.map.id) + '     score:  '
-        label = self.font.render(text, 1, (255, 255, 255), (0, 0, 0))
+        label = self.font.render(text, 1, (200, 190, 140), self.fill_color)
         self.object_mgr.display.blit(label, (96, 4))
         offset = 664
 
@@ -258,7 +262,7 @@ class GameScene(Scene):
             if player.ball.turn:
                 pygame.draw.rect(self.object_mgr.display, (240, 50, 50), (offset-2, 2, 60, 60), 2)
             else:
-                pygame.draw.rect(self.object_mgr.display, self.background_color, (offset-2, 2, 60, 60), 2)
+                pygame.draw.rect(self.object_mgr.display, self.fill_color, (offset-2, 2, 60, 60), 2)
 
             ball_img = ResourcesManager.get_image('obj_ball_' + player.color)
             ball_img = pygame.transform.scale(ball_img, (56, 56))

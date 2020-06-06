@@ -9,6 +9,7 @@ from client.gui.GUIManager import GUIManager
 # is storing all of the objects and gui elements
 # present in that scene and is responsible for
 # drawing and updating them.
+
 class Scene:
     def __init__(self, space, fill_color=(0, 0, 0)):
         self.fill_color = fill_color

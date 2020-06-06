@@ -2,7 +2,6 @@ import pygame
 
 from client.gui.GUIElement import GUIElement
 from client.models.scene_init import SceneInit
-from client.models.player import Player
 
 
 class Button(GUIElement):
@@ -94,4 +93,3 @@ class Button(GUIElement):
     def get_current_screen(self):
         info = pygame.display.Info()
         return pygame.display.set_mode((info.current_w, info.current_h), pygame.RESIZABLE)
-

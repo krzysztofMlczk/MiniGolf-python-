@@ -76,6 +76,7 @@ class EditorScene(Scene):
                 if self.button_save.clicked(mouse_pos):
                     FileUtils.save(self.grid)
                 elif self.button_load.clicked(mouse_pos):
+                    self.generate_grid()
                     FileUtils.load(self.grid)
                 elif self.button_export.clicked(mouse_pos):
                     FileUtils.export(self.grid)

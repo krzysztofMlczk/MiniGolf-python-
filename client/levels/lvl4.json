@@ -1,0 +1,73 @@
+{
+  "id": 4,
+  "cup": {
+    "pos": [1550, 800],
+    "dim": [32, 32]
+  },
+  "obstacles": [
+    {
+      "name": "brick",
+      "pos": [64, 64],
+      "dim": [64, 64],
+      "vertical": 14
+    },
+    {
+      "name": "brick",
+      "pos": [64, 64],
+      "dim": [64, 64],
+      "horizontal": 26
+    },
+    {
+      "name": "brick",
+      "pos": [64, 960],
+      "dim": [64, 64],
+      "horizontal": 26
+    },
+    {
+      "name": "brick",
+      "pos": [1728, 64],
+      "dim": [64, 64],
+      "vertical": 15
+    },
+    {
+      "name": "brick",
+      "pos": [448, 352],
+      "dim": [64, 64],
+      "horizontal": 15
+    },
+    {
+      "name": "rock",
+      "pos": [900, 650],
+      "dim": [150, 150]
+    },
+    {
+      "name": "rock",
+      "pos": [580, 800],
+      "dim": [100, 100]
+    },
+    {
+      "name": "rock",
+      "pos": [610, 500],
+      "dim": [100, 100]
+    },
+    {
+      "name": "rock",
+      "pos": [1200, 570],
+      "dim": [100, 100]
+    },
+    {
+      "name": "rock",
+      "pos": [1100, 760],
+      "dim": [100, 100]
+    }
+  ],
+  "surfaces": [
+    {
+        "name": "dirt",
+        "pos": [480, 416],
+        "dim": [64, 64],
+        "horizontal": 14,
+        "vertical": 9
+    }
+  ]
+}

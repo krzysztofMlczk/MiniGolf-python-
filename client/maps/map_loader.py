@@ -44,4 +44,4 @@ class Loader(object):
 
         cup = ObjectCup(self.obj_mgr, **level['cup'], )
 
-        return level['id'], cup
+        return level['id'], cup, level['ball']

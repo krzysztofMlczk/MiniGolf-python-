@@ -2,6 +2,7 @@ import pygame
 
 from client.gui.GUIElement import GUIElement
 from client.models.scene_init import SceneInit
+from client.models.player import Player
 
 
 class Button(GUIElement):
@@ -57,6 +58,7 @@ class Button(GUIElement):
             elif self.name == "quit":
                 scene_init = None
                 exit(0)
+                # scene_init = SceneInit("Score", players=[Player(0, "yellow")], screen=self.get_current_screen())
 
             else:
                 scene_init = None

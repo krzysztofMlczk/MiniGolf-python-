@@ -54,15 +54,6 @@ class Ball(Object):
             if sign(velocity.y) != sign(body.velocity.y):
                 velocity.y = 0.0
 
-            # Establish maximum velocity
-            max_velocity = 1800.0
-
-            if math.fabs(velocity.x) > max_velocity:
-                velocity.x = max_velocity * sign(velocity.x)
-
-            if math.fabs(velocity.y) > max_velocity:
-                velocity.y = max_velocity * sign(velocity.y)
-
             body.velocity = velocity
 
             if body.velocity == Vec2d(0.0, 0.0):

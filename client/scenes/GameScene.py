@@ -1,9 +1,11 @@
+import math
+
 import pygame
 import pymunk
 from pymunk import Vec2d
 
 from client.models.scene_init import SceneInit
-from client.utils import flip_coords
+from client.utils import flip_coords, sign
 from client.maps.Map import Map
 from client.scenes.Scene import Scene
 from client.enums.ball_state_enum import BallState
@@ -84,6 +86,15 @@ class GameScene(Scene):
                         player.ball.shape.body.position.x - flip_coords(event.pos)[0] + self.camera_offset[0],
                         player.ball.shape.body.position.y - flip_coords(event.pos)[1] - self.camera_offset[1]
                     )
+
+                    # Max impulse
+                    if math.fabs(direction.x) > 1800:
+                        coeff = math.fabs(1800 / direction.x)
+                        direction *= coeff
+
+                    if math.fabs(direction.y) > 1800:
+                        coeff = math.fabs(1800 / direction.y)
+                        direction *= coeff
 
                     player.ball.shape.body.apply_impulse_at_local_point(direction)
                     self.next_turn = True

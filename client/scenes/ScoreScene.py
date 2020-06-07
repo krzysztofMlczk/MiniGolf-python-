@@ -62,28 +62,12 @@ class ScoreScene(Scene):
             default_res=(width, height)
         )
 
-        # setup about label
-        about = Label(
-            name="about",
+        # setup score label
+        score = Label(
+            name="score",
             dimension=(500, 500),
             position=(750, 450),
-            image=ResourcesManager.get_image("winner_window"),
-            obj_mgr=self.gui_mgr,
-            default_res=(width, height)
-        )
-        players = Label(
-            name="player_label",
-            dimension=(200, 30),
-            position=(900, 600),
-            image=ResourcesManager.get_image("players_label"),
-            obj_mgr=self.gui_mgr,
-            default_res=(width, height)
-        )
-        players = Label(
-            name="player_label",
-            dimension=(30, 130),
-            position=(800, 700),
-            image=pygame.transform.rotate(ResourcesManager.get_image("maps_label"), 90),
+            image=ResourcesManager.get_image("score_window"),
             obj_mgr=self.gui_mgr,
             default_res=(width, height)
         )
@@ -121,35 +105,43 @@ class ScoreScene(Scene):
                     elem.on_mouse_quit()
 
     def draw(self, screen):
-        self.gui_mgr.resize_gui(screen)
+        # self.gui_mgr.resize_gui(screen)
         self.gui_mgr.update_gui()
         self.gui_mgr.draw_gui(screen)
 
     def set_scores(self, players):
-        colors = ["white", "yellow", "pink", "orange", "blue"]
+        colors = ["white", "blue", "orange", "pink", "yellow"]
+        # color.index(color)
 
-        for player in players:
-            y, s = 0, 0
-            x = colors.index(player.color)
+        starting_x = 750 + 129 - 12
+        starting_y = 450 + 223 - 12
+        x_shift = 65
+        y_shift = 56
+        for color in colors:
+            player = self.find_player(color, players)
+            score = {}
+            if player:
+                score = player.points
 
-            for k, points in player.points.items():
-                s += points
+            for i in range(1, 6):
+                if str(i) not in score.keys():
+                    score[str(i)] = "-"
+
+            score_items = sorted(score.items())
+
+            for map_id, points in score_items:
+
                 Label(
                     name="player_label",
                     dimension=(24, 24),
-                    position=(800 + (x*40), 700 + (y*40)),
+                    position=(starting_x + colors.index(color) * x_shift, starting_y + (int(map_id) - 1) * y_shift),
                     image=self.font.render(str(points), 1, (255, 255, 255)),
                     obj_mgr=self.gui_mgr,
                     default_res=(1920, 1080)
                 )
-                y += 1
-            y = 7
 
-            Label(
-                name="player_label",
-                dimension=(24, 24),
-                position=(800 + (x*40), 700 + (y*40)),
-                image=self.font.render(str(s), 1, (255, 255, 255)),
-                obj_mgr=self.gui_mgr,
-                default_res=(1920, 1080)
-            )
+    def find_player(self, color, players):
+        for player in players:
+            if player.color == color:
+                return player
+        return None

@@ -24,12 +24,7 @@ class SetupScene(Scene):
         self.players_amount = 2
         self.maps_to_play = 1
         self.players = []
-        
-        # Add one player
-        self.add_player()
 
-        if self.multi:
-            self.add_player()
 
         self.gui_mgr.resize_gui(screen)
 
@@ -173,3 +168,16 @@ class SetupScene(Scene):
                     new_image = ResourcesManager.get_image("amount_" + str(self.maps_to_play))
                     element.set_image_original(new_image)
                     element.set_size(element.get_size())
+
+    def setup(self, screen=None, **kwargs):
+        self.players = []
+
+        SetupScene.available_colors = ["yellow", "orange", "blue", "pink", "white"]
+        SetupScene.available_players_id = [0, 1, 2, 3, 4]
+
+        # Add one player
+        self.add_player()
+
+        if self.multi:
+            self.add_player()
+
